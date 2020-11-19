@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_sound_list_small_box"
+            android:orientation="vertical"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/item_sound_position_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/ic_sound_list_small_flag"
+                android:fontFamily="@font/scd6"
+                android:gravity="center"
+                android:text="경적1"
+                android:textColor="@android:color/white"
+                android:textSize="7.59sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="2dp"
+                android:fontFamily="@font/scd6"
+                android:text="카션 안전음"
+                android:textColor="@color/color_A281DE"
+                android:textSize="6.17sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/item_sound_title_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:ellipsize="marquee"
+            android:fontFamily="@font/scd5"
+            android:singleLine="true"
+            android:text="빵빵 양보해 주셔서 감사합니다"
+            android:textColor="@android:color/white"
+            android:textSize="11.39sp" />
+
+        <ImageButton
+            android:id="@+id/item_sound_preview_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="18dp"
+            android:background="@null"
+            android:src="@drawable/listening_selector" />
+
+        <ImageButton
+            android:id="@+id/item_sound_download_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="14dp"
+            android:background="@null"
+            android:src="@drawable/download_selector" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/color_D9D9D9" />
+
+</LinearLayout>

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "942896279320",
+    "firebase_url": "https://cartion.firebaseio.com",
+    "project_id": "cartion",
+    "storage_bucket": "cartion.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:942896279320:android:6ba2c4e0293efe8d2cb86d",
+        "android_client_info": {
+          "package_name": "net.belicon.cartion"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "942896279320-a8sablal1751sinh4ffl0t93b97ru9k6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGda7fe9PY1RUhflFNgaxdOuonZWMXnFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "942896279320-a8sablal1751sinh4ffl0t93b97ru9k6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

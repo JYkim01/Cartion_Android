@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="15dp"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_sound_list_box"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/item_36_switch_pos_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/ic_sound_list_flag2"
+                android:fontFamily="@font/scd7"
+                android:gravity="center"
+                android:padding="2dp"
+                android:text="경적3"
+                android:textColor="@android:color/white"
+                android:textSize="9.49sp" />
+
+            <TextView
+                android:id="@+id/item_36_switch_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="@font/scd6"
+                android:gravity="center_horizontal"
+                android:text="카션 안점음"
+                android:textColor="@color/color_7F44A6"
+                android:textSize="6.17sp" />
+
+            <TextView
+                android:id="@+id/item_36_switch_play_name"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_weight="1"
+                android:drawableEnd="@drawable/ic_sound_play_icon"
+                android:drawablePadding="8dp"
+                android:fontFamily="@font/scd6"
+                android:gravity="center_vertical"
+                android:maxLines="3"
+                android:text="빵빵 양보해 주셔서 감사합니다"
+                android:textColor="@color/color_531F57"
+                android:textSize="7.59sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

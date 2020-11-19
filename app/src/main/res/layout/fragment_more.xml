@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/sign_bg"
+        android:orientation="vertical"
+        android:padding="19dp">
+
+        <LinearLayout
+            android:id="@+id/more_faq_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_faq_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/scd5"
+                android:gravity="center_vertical"
+                android:text="FAQ"
+                android:textColor="@color/color_606060"
+                android:textSize="11.39sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/more_cartion_learn_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_cartion_learn_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/scd5"
+                android:gravity="center_vertical"
+                android:text="카션 알아보기"
+                android:textColor="@color/color_606060"
+                android:textSize="11.39sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/more_app_manual_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_app_manual_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/scd5"
+                android:gravity="center_vertical"
+                android:text="앱 설명서"
+                android:textColor="@color/color_606060"
+                android:textSize="11.39sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/more_notice_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_notice_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/scd5"
+                android:gravity="center_vertical"
+                android:text="공지사항"
+                android:textColor="@color/color_606060"
+                android:textSize="11.39sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/more_app_info_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_app_info_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/scd5"
+                android:gravity="center_vertical"
+                android:text="앱 정보"
+                android:textColor="@color/color_606060"
+                android:textSize="11.39sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/more_coupon_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/coupon_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/scd5"
+                android:gravity="center_vertical"
+                android:text="쿠폰 입력"
+                android:textColor="@color/color_606060"
+                android:textSize="11.39sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

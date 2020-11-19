@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".SignUpOneActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:fontFamily="@font/scd5"
+            android:text="서비스 이용약관"
+            android:textColor="@color/color_7F44A6"
+            android:textSize="14.23sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/color_D9D9D9" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/scd5"
+            android:text="수집하는 개인정보의 항목"
+            android:textColor="@android:color/black"
+            android:textSize="11.39sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="15dp"
+            android:fontFamily="@font/scd4"
+            android:text="카션은 서비스 제공에 관한 계약 이행, 이용자 식별, 서비스 개선, 신규 서비스 개발, 회원가입, 상담을 위하여 필요 최소한의 개인 정보를 수집합니다.\n\n카션은 이용자의 사전 동의를 받고, 서비스의 본질적 기능을 수행하기 위하여 반드시 필요한 필수항목과 보다 특화된 서비스를 제공하기 위한 선택항목을 수집합니다.\n\n카션은 서비스 제공에 관한 계약 이행, 이용자 식별, 서비스 개선, 신규 서비스 개발, 회원가입, 상담을 위하여 필요 최소한의 개인 정보를 수집합니다.\n\n카션은 이용자의 사전 동의를 받고, 서비스의 본질적 기능을 수행하기 위하여 반드시 필요한 필수항목과 보다 특화된 서비스를 제공하기 위한 선택항목을 수집합니다.\n\n카션은 서비스 제공에 관한 계약 이행, 이용자 식별, 서비스 개선, 신규 서비스 개발, 회원가입, 상담을 위하여 필요 최소한의 개인 정보를 수집합니다.\n\n카션은 이용자의 사전 동의를 받고, 서비스의 본질적 기능을 수행하기 위하여 반드시 필요한 필수항목과 보다 특화된 서비스를 제공하기 위한 선택항목을 수집합니다."
+            android:textColor="@color/color_606060"
+            android:textSize="11.39sp" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/sign_one_next_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/ic_service_button"
+        android:fontFamily="@font/scd5"
+        android:text="동의"
+        android:textColor="@android:color/white"
+        android:textSize="12.34sp" />
+
+</RelativeLayout>
