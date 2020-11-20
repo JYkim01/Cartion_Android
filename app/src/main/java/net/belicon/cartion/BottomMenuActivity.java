@@ -47,6 +47,7 @@ import com.google.gson.GsonBuilder;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
+import net.belicon.cartion.R;
 import net.belicon.cartion.adapters.BannerPagerAdapter;
 import net.belicon.cartion.adapters.ChangeAdapter;
 import net.belicon.cartion.adapters.DownloadAdapter;
@@ -276,7 +277,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         } else {
             span.setSpan(new StyleSpan(BOLD), one_start, one_end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-        span.setSpan(new AbsoluteSizeSpan(16, true), one_start, one_end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span.setSpan(new AbsoluteSizeSpan(18, true), one_start, one_end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.color_7F44A6)), one_start, one_end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.color_7F44A6)), coupon_message.indexOf(two), coupon_message.indexOf(two) + two.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         mCouponContent.setText(span);
@@ -578,22 +579,20 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                         if (response.code() == 200) {
                             if (response.body() != null) {
                                 int mobileSw = response.body().getData().getMobileSwitch();
-//                                if (mobileSw == 0) {
-//                                    m36Container.setVisibility(View.INVISIBLE);
-//                                    m36PurchaseBtn.setVisibility(View.VISIBLE);
-//                                } else if (mobileSw == 1) {
+                                if (mobileSw == 0) {
+                                    m36Container.setVisibility(View.INVISIBLE);
+                                    m36PurchaseBtn.setVisibility(View.VISIBLE);
+                                } else if (mobileSw == 1) {
                                     m36Line.setVisibility(View.VISIBLE);
                                     m36Container.setVisibility(View.VISIBLE);
-////                                    m710Container.setVisibility(View.INVISIBLE);
-////                                    m710PurchaseBtn.setVisibility(View.VISIBLE);
-//                                    m710Line.setVisibility(View.VISIBLE);
-//                                    m710Container.setVisibility(View.VISIBLE);
-//                                } else if (mobileSw == 2) {
-//                                m36Line.setVisibility(View.VISIBLE);
-//                                m36Container.setVisibility(View.VISIBLE);
+                                    m710Container.setVisibility(View.INVISIBLE);
+                                    m710PurchaseBtn.setVisibility(View.VISIBLE);
+                                } else if (mobileSw == 2) {
+                                    m36Line.setVisibility(View.VISIBLE);
+                                    m36Container.setVisibility(View.VISIBLE);
                                     m710Line.setVisibility(View.VISIBLE);
                                     m710Container.setVisibility(View.VISIBLE);
-//                                }
+                                }
                                 List<SwitchList> list = response.body().getData().getHornList();
                                 for (int i = 0; i < list.size(); i++) {
                                     String userId = list.get(i).getUserId();
@@ -603,7 +602,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     String categoryName = list.get(i).getCategoryName();
                                     int seq = list.get(i).getMobileSwitch();
                                     String type = list.get(i).getType();
-                                    mSwitchMusic.set(seq - 1, new UserMobile(email, seq, hornName, categoryName, hornType, hornId));
+                                    mSwitchMusic.set(i, new UserMobile(email, seq, hornName, categoryName, hornType, hornId));
                                 }
 
                                 mIotSwitchAdapter = new IotSwitchAdapter(mSwitchMusic);
@@ -661,14 +660,15 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                         .enqueue(new Callback<MyPage>() {
                             @Override
                             public void onResponse(Call<MyPage> call, Response<MyPage> response) {
-                                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                                Log.e("TEST", gson.toJson(mSwitchMusic));
+//                                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//                                Log.e("TEST", gson.toJson(mSwitchMusic));
                                 Log.e("CHANGE", response.code() + "");
                                 if (response.code() == 200) {
                                     String list = "";
                                     for (int i = 0; i < mSwitchMusic.size(); i++) {
-                                        list += String.valueOf(mSwitchMusic.get(i).getMobileSwitch());
+                                        list += String.valueOf(mSwitchMusic.get(i).getMobileSwitch() - 1);
                                     }
+                                    Log.e("TEST", list);
                                     if (BleManager.getInstance().isConnected(mBleDevice)) {
                                         writeData(mBleDevice,
                                                 "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
@@ -941,7 +941,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             onCommend0("" + pos)
                     );
                 }
-                onSoundChange("" + pos + 1);
+                onSoundChange("" + pos);
             }
         });
     }
@@ -968,7 +968,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             onCommend0("" + (position + 2))
                     );
                 }
-                onSoundChange("" + (position + 3));
+                onSoundChange("" + (position + 2));
             }
         });
     }
@@ -995,7 +995,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             onCommend0("" + (position + 5))
                     );
                 }
-                onSoundChange("" + (position + 6));
+                onSoundChange("" + (position + 5));
             }
         });
     }

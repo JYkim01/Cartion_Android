@@ -36,27 +36,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:background="@drawable/ic_search_bg"
                 android:gravity="center"
                 android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_search_title" />
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/search_title" />
 
                 <TextView
                     android:id="@+id/home_search_noti_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:fontFamily="@font/scd5"
+                    android:fontFamily="@font/scd4"
                     android:gravity="center"
                     android:lineSpacingExtra="4dp"
                     android:paddingTop="20dp"
                     android:text="주변에 접속 가능한 카션이 없습니다.\n카션 근처로 이동하여\n'검색 버튼'을 눌러주세요"
-                    android:textColor="@android:color/white"
-                    android:textSize="12.34sp" />
+                    android:textColor="@color/color_606060"
+                    android:textSize="13.29sp" />
 
                 <ImageButton
                     android:id="@+id/home_cartion_search_btn"

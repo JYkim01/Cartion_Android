@@ -2,106 +2,77 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginStart="15dp"
-    android:layout_marginEnd="15dp"
     android:background="@android:color/white"
     android:clickable="true"
     android:focusable="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/ic_coupon_backgroung"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+    <!--    <ImageView-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_centerInParent="true"-->
+    <!--        android:layout_gravity="center_vertical"-->
+    <!--        android:layout_marginTop="70dp"-->
+    <!--        android:scaleType="centerCrop"-->
+    <!--        android:src="@drawable/coupon_bg" />-->
+
+    <RelativeLayout
+        android:layout_width="310dp"
+        android:layout_height="275dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/coupon_bg">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:orientation="vertical">
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="30dp"
-                android:src="@drawable/ic_coupon_ribbon_text" />
-
-            <!--            <TextView-->
-            <!--                android:id="@+id/coupon_title"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_gravity="center_horizontal"-->
-            <!--                android:background="@null"-->
-            <!--                android:fontFamily="@font/scd6"-->
-            <!--                android:text="쿠폰"-->
-            <!--                android:textColor="@color/color_7F44A6"-->
-            <!--                android:textSize="13.29sp" />-->
-
-            <!--            <LinearLayout-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_gravity="center_horizontal"-->
-            <!--                android:orientation="vertical">-->
+                android:layout_marginTop="20dp"
+                android:src="@drawable/open_ribbon" />
 
             <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/coupon_content"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="@font/scd5"
-                    android:gravity="center"
-                    android:lineSpacingExtra="4dp"
-                    android:text="하단 박스에 '카션' 을 입력하시면,\n'모바일 스위치1개 쿠폰'\n을 드립니다."
-                    android:textColor="@android:color/white"
-                    android:textSize="12.34sp" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="40dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/coupon_content"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginTop="15dp"
-                        android:layout_weight="1"
-                        android:src="@drawable/left_ribbon" />
+                        android:layout_marginTop="6dp"
+                        android:fontFamily="@font/scd5"
+                        android:gravity="center"
+                        android:lineSpacingExtra="4dp"
+                        android:text="하단 박스에 '카션' 을 입력하시면,\n'모바일 스위치1개 쿠폰'\n을 드립니다."
+                        android:textColor="@android:color/white"
+                        android:textSize="14.23sp" />
 
                     <EditText
-                        android:layout_width="0dp"
+                        android:layout_width="170dp"
                         android:layout_height="50dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_weight="2"
+                        android:layout_marginTop="6dp"
                         android:background="@android:color/white"
                         android:fontFamily="@font/scd6"
+                        android:gravity="center"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
-                        android:text="Cartion"
-                        android:textColor="@color/color_7F44A6"
-                        android:textSize="16.13dp" />
-
-                    <ImageView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="25dp"
-                        android:layout_weight="1"
-                        android:src="@drawable/right_ribbon" />
+                        android:text="카 션"
+                        android:textColor="@color/color_D9D9D9"
+                        android:textSize="20.88dp" />
 
                 </LinearLayout>
 
             </RelativeLayout>
-
-            <!--            </LinearLayout>-->
 
         </LinearLayout>
 
@@ -109,10 +80,12 @@
             android:id="@+id/coupon_confirm_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:layout_marginBottom="20dp"
             android:background="@null"
             android:src="@drawable/ic_coupon_button" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>
