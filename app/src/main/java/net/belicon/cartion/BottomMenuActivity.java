@@ -11,6 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothGatt;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -60,8 +63,10 @@ import net.belicon.cartion.models.Coupon;
 import net.belicon.cartion.models.CouponList;
 import net.belicon.cartion.models.Device;
 import net.belicon.cartion.models.Down;
+import net.belicon.cartion.models.Login;
 import net.belicon.cartion.models.MobileSwitch;
 import net.belicon.cartion.models.MyPage;
+import net.belicon.cartion.models.RefreshToken;
 import net.belicon.cartion.models.SwitchList;
 import net.belicon.cartion.models.User;
 import net.belicon.cartion.models.UserMobile;
@@ -79,8 +84,14 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import io.realm.DynamicRealm;
+import io.realm.FieldAttribute;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmMigration;
+import io.realm.RealmObject;
+import io.realm.RealmObjectSchema;
+import io.realm.RealmSchema;
 import pyxis.uzuki.live.rollingbanner.RollingBanner;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -114,6 +125,9 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
     private ProgressDialog mProgressDialog;
 
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
+
     private List<UserMobile> mSwitchMusic;
     private List<UserMobile> mDownMusic;
 
@@ -132,8 +146,25 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_bottom_menu);
 
         Realm.init(this);
-        RealmConfiguration config = new RealmConfiguration.Builder().name("appdb.realm").build();
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .schemaVersion(1)
+                .migration(new RealmMigration() {
+                    @Override
+                    public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                        RealmSchema schema = realm.getSchema();
+                        if (oldVersion == 1) {
+                            RealmObjectSchema mUserMobileSchema = schema.get("UserMobile");
+                            if (mUserMobileSchema != null) {
+                                mUserMobileSchema.addField("categoryName", String.class, (FieldAttribute) null);
+                            }
+
+                            oldVersion++;
+                        }
+                    }
+                })
+                .build();
         Realm.setDefaultConfiguration(config);
+        preferences = getSharedPreferences("switch_key", Context.MODE_PRIVATE);
 
         mBannerPager = findViewById(R.id.bottom_main_banner);
         mHomeBtn = findViewById(R.id.bottom_home_btn);
@@ -220,7 +251,9 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         mHomeBtn.setChecked(true);
         onCoupon();
 
-        realm = Realm.getDefaultInstance();
+        if (Realm.getDefaultInstance() != null) {
+            realm = Realm.getDefaultInstance();
+        }
     }
 
     @Override
@@ -567,10 +600,17 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 });
     }
 
+    private String clist;
     private void onSwitch() {
         mSwitchMusic.clear();
         for (int i = 0; i < 10; i++) {
             mSwitchMusic.add(new UserMobile(email, i + 1, "기본", "배려/안전", "horn", String.valueOf(i + 1)));
+        }
+        clist = "";
+        if (preferences != null) {
+            if (!preferences.getString("cswitch", "").equals("")) {
+                clist = preferences.getString("cswitch", "");
+            }
         }
         mRetInterface.getMobileSwitch(token, email)
                 .enqueue(new Callback<MobileSwitch>() {
@@ -602,7 +642,11 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     String categoryName = list.get(i).getCategoryName();
                                     int seq = list.get(i).getMobileSwitch();
                                     String type = list.get(i).getType();
-                                    mSwitchMusic.set(i, new UserMobile(email, seq, hornName, categoryName, hornType, hornId));
+                                    if (clist.equals("")) {
+                                        mSwitchMusic.set(i, new UserMobile(email, seq, hornName, categoryName, hornType, hornId));
+                                    } else {
+                                        mSwitchMusic.set(Integer.parseInt(clist.substring(i, i + 1)), new UserMobile(email, seq, hornName, categoryName, hornType, hornId));
+                                    }
                                 }
 
                                 mIotSwitchAdapter = new IotSwitchAdapter(mSwitchMusic);
@@ -656,6 +700,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onClick(View v) {
                 adapter.notifyDataSetChanged();
+                editor = preferences.edit();
                 mRetInterface.putMobileList(token, email, mSwitchMusic)
                         .enqueue(new Callback<MyPage>() {
                             @Override
@@ -668,7 +713,8 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     for (int i = 0; i < mSwitchMusic.size(); i++) {
                                         list += String.valueOf(mSwitchMusic.get(i).getMobileSwitch() - 1);
                                     }
-                                    Log.e("TEST", list);
+                                    editor.putString("cswitch", list);
+                                    editor.apply();
                                     if (BleManager.getInstance().isConnected(mBleDevice)) {
                                         writeData(mBleDevice,
                                                 "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
@@ -679,6 +725,9 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                 } else {
                                     Toast.makeText(BottomMenuActivity.this, "순서변경 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                                 }
+                                mIotSwitchAdapter.notifyDataSetChanged();
+                                mMobile36SwitchAdapter.notifyDataSetChanged();
+                                mMobile710SwitchAdapter.notifyDataSetChanged();
                                 dialog.dismiss();
                             }
 
@@ -725,9 +774,15 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         File file = new File(getExternalFilesDir(null).getAbsolutePath());
         File[] files = file.listFiles();
         for (File tempFile : files) {
-            musicList.add(new Down(tempFile.getName(), tempFile));
+            String hornId = "";
+            if (realm.where(UserMobile.class).findAll().size() != 0) {
+                hornId = realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst().getHornId();
+            } else {
+                hornId = "";
+            }
+            musicList.add(new Down(tempFile.getName(), tempFile, hornId));
         }
-        DownloadAdapter adapter = new DownloadAdapter(musicList);
+        DownloadAdapter adapter = new DownloadAdapter(musicList, token);
         recyclerView.setAdapter(adapter);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(view);
@@ -911,6 +966,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 getSupportFragmentManager().beginTransaction().add(R.id.bottom_menu_container, new MoreFragment()).addToBackStack(null).commit();
                 break;
             case R.id.home_cartion_search_btn:
+                BleManager.getInstance().disconnectAllDevice();
                 startScan();
                 break;
             case R.id.home_switch_change_btn:
@@ -928,6 +984,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
                             onAction0("" + pos)
+//                            onAction0("" + (mSwitchMusic.get(pos).getMobileSwitch() - 1))
                     );
                 }
             }
@@ -938,10 +995,10 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                     writeData(mBleDevice,
                             "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
-                            onCommend0("" + pos)
+                            onCommend0("" + (mSwitchMusic.get(pos).getMobileSwitch() - 1))
                     );
                 }
-                onSoundChange("" + pos);
+                onSoundChange("" + (mSwitchMusic.get(pos).getMobileSwitch() - 1));
             }
         });
     }
@@ -955,6 +1012,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
                             onAction0("" + (position + 2))
+//                            onAction0("" + (mSwitchMusic.get(position).getMobileSwitch() + 2))
                     );
                 }
             }
@@ -965,10 +1023,10 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                     writeData(mBleDevice,
                             "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
-                            onCommend0("" + (position + 2))
+                            onCommend0("" + (mSwitchMusic.get(position).getMobileSwitch() + 2))
                     );
                 }
-                onSoundChange("" + (position + 2));
+                onSoundChange("" + (mSwitchMusic.get(position).getMobileSwitch() + 2));
             }
         });
     }
@@ -982,6 +1040,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
                             onAction0("" + (position + 5))
+//                            onAction0("" + (mSwitchMusic.get(position).getMobileSwitch() + 5))
                     );
                 }
             }
@@ -992,10 +1051,10 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                     writeData(mBleDevice,
                             "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
-                            onCommend0("" + (position + 5))
+                            onCommend0("" + (mSwitchMusic.get(position).getMobileSwitch() + 5))
                     );
                 }
-                onSoundChange("" + (position + 5));
+                onSoundChange("" + (mSwitchMusic.get(position).getMobileSwitch() + 5));
             }
         });
     }

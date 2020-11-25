@@ -58,13 +58,21 @@
             android:textColor="@android:color/white"
             android:textSize="11.39sp" />
 
-        <!--        <ImageButton-->
-        <!--            android:id="@+id/item_download_change_btn"-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:layout_marginEnd="14dp"-->
-        <!--            android:background="@null"-->
-        <!--            android:src="@drawable/download_selector" />-->
+        <ImageButton
+            android:id="@+id/item_download_preview_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="18dp"
+            android:background="@null"
+            android:src="@drawable/listening_selector" />
+
+        <ImageButton
+            android:id="@+id/item_download_download_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="14dp"
+            android:background="@null"
+            android:src="@drawable/download_selector" />
 
     </LinearLayout>
 
