@@ -102,7 +102,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
                     headers.put("Authorization", mAuth);
 
                     MediaPlayer mediaPlayer = new MediaPlayer();
-                    mediaPlayer.setDataSource(holder.mMusicPreviewBtn.getContext(), Uri.parse("http://49.50.172.53:9983/api/horn/wav/" + mMusicList.get(position).getHornId() + "/"), headers);
+                    mediaPlayer.setDataSource(holder.mMusicPreviewBtn.getContext(), Uri.parse("https://api.cartion.co.kr:9983/api/horn/wav/" + mMusicList.get(position).getHornId() + "/"), headers);
                     mediaPlayer.prepare();
                     mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                         @Override
@@ -135,7 +135,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
                 if (mDownList.contains(mMusicList.get(position).getHornName() + ".wav")) {
                     Toast.makeText(holder.mMusicDownloadBtn.getContext(), "이미 존재하는 음원입니다.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Uri downloadUri = Uri.parse("http://49.50.172.53:9983/api/horn/ADPCM/" + mMusicList.get(position).getHornId() + "/");
+                    Uri downloadUri = Uri.parse("https://api.cartion.co.kr:9983/api/horn/ADPCM/" + mMusicList.get(position).getHornId() + "/");
                     Realm realm = Realm.getDefaultInstance();
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override

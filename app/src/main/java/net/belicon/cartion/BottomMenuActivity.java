@@ -446,6 +446,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                     BleManager.getInstance().cancelScan();
                     connect(bleDevice);
                     mBleDevice = bleDevice;
+                    mHomeDialog.setVisibility(View.GONE);
                 }
             }
 
@@ -601,6 +602,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
     }
 
     private String clist;
+
     private void onSwitch() {
         mSwitchMusic.clear();
         for (int i = 0; i < 10; i++) {
@@ -775,8 +777,12 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         File[] files = file.listFiles();
         for (File tempFile : files) {
             String hornId = "";
-            if (realm.where(UserMobile.class).findAll().size() != 0) {
-                hornId = realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst().getHornId();
+            if (realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst() != null) {
+                if (realm.where(UserMobile.class).findAll().size() != 0) {
+                    hornId = realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst().getHornId();
+                } else {
+                    hornId = "";
+                }
             } else {
                 hornId = "";
             }

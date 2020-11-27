@@ -67,7 +67,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
                         headers.put("Authorization", mAuth);
 
                         MediaPlayer mediaPlayer = new MediaPlayer();
-                        mediaPlayer.setDataSource(holder.mMusicPreviewBtn.getContext(), Uri.parse("http://49.50.172.53:9983/api/horn/wav/" + item.getHornId() + "/"), headers);
+                        mediaPlayer.setDataSource(holder.mMusicPreviewBtn.getContext(), Uri.parse("https://api.cartion.co.kr:9983/api/horn/wav/" + item.getHornId() + "/"), headers);
                         mediaPlayer.prepare();
                         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                             @Override
