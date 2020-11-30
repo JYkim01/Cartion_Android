@@ -3,9 +3,11 @@ package net.belicon.cartion;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -38,6 +40,8 @@ public class SignUpTwoActivity extends AppCompatActivity implements View.OnClick
     private TextView mJoinPwMessage, mJoinPwConfirmMessage;
     private ImageButton mEmailConfirmBtn;
 
+    private InputMethodManager imm;
+
     private String email, password, phone;
     private boolean isChecked = false;
 
@@ -60,10 +64,16 @@ public class SignUpTwoActivity extends AppCompatActivity implements View.OnClick
         findViewById(R.id.join_success_btn).setOnClickListener(this);
 
         mRetInterface = RetrofitUtility.getRetrofitInterface();
+
+        imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     @Override
     public void onClick(View v) {
+        imm.hideSoftInputFromWindow(mEmailEdit.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(mPasswordEdit.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(mPasswordConfirmEdit.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(mPhoneEdit.getWindowToken(), 0);
         switch (v.getId()) {
             case R.id.join_email_confirm_btn:
                 onEmailConfirmBtn();

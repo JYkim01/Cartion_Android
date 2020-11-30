@@ -26,18 +26,22 @@ public class SwitchList implements Serializable {
     @SerializedName("mobileSwitch")
     @Expose
     private Integer mobileSwitch;
+    @SerializedName("seq")
+    @Expose
+    private Integer seq;
     @SerializedName("type")
     @Expose
     private String type;
     private final static long serialVersionUID = -4882857284497398403L;
 
-    public SwitchList(String userId, String hornType, String hornId, String hornName, String categoryName, Integer mobileSwitch, String type) {
+    public SwitchList(String userId, String hornType, String hornId, String hornName, String categoryName, Integer mobileSwitch, Integer seq, String type) {
         this.userId = userId;
         this.hornType = hornType;
         this.hornId = hornId;
         this.hornName = hornName;
         this.categoryName = categoryName;
         this.mobileSwitch = mobileSwitch;
+        this.seq = seq;
         this.type = type;
     }
 
@@ -89,6 +93,14 @@ public class SwitchList implements Serializable {
         this.mobileSwitch = mobileSwitch;
     }
 
+    public Integer getSeq() {
+        return seq;
+    }
+
+    public void setSeq(Integer seq) {
+        this.seq = seq;
+    }
+
     public String getType() {
         return type;
     }
@@ -106,6 +118,7 @@ public class SwitchList implements Serializable {
                 ", hornName='" + hornName + '\'' +
                 ", categoryName='" + categoryName + '\'' +
                 ", mobileSwitch=" + mobileSwitch +
+                ", seq=" + seq +
                 ", type='" + type + '\'' +
                 '}';
     }

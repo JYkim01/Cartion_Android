@@ -14,6 +14,8 @@ import android.bluetooth.BluetoothGatt;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -125,9 +127,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
     private ProgressDialog mProgressDialog;
 
-    private SharedPreferences preferences;
-    private SharedPreferences.Editor editor;
-
     private List<UserMobile> mSwitchMusic;
     private List<UserMobile> mDownMusic;
 
@@ -147,15 +146,22 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
         Realm.init(this);
         RealmConfiguration config = new RealmConfiguration.Builder()
-                .schemaVersion(1)
+                .schemaVersion(2)
                 .migration(new RealmMigration() {
                     @Override
                     public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
                         RealmSchema schema = realm.getSchema();
-                        if (oldVersion == 1) {
+                        if (newVersion == 1) {
                             RealmObjectSchema mUserMobileSchema = schema.get("UserMobile");
                             if (mUserMobileSchema != null) {
                                 mUserMobileSchema.addField("categoryName", String.class, (FieldAttribute) null);
+                            }
+
+                            oldVersion++;
+                        } else if (newVersion == 2) {
+                            RealmObjectSchema mUserMobileSchema = schema.get("UserMobile");
+                            if (mUserMobileSchema != null) {
+                                mUserMobileSchema.addField("seq", int.class, (FieldAttribute) null);
                             }
 
                             oldVersion++;
@@ -164,7 +170,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 })
                 .build();
         Realm.setDefaultConfiguration(config);
-        preferences = getSharedPreferences("switch_key", Context.MODE_PRIVATE);
 
         mBannerPager = findViewById(R.id.bottom_main_banner);
         mHomeBtn = findViewById(R.id.bottom_home_btn);
@@ -217,6 +222,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         mCartionSearchBtn.setOnClickListener(this);
 
         findViewById(R.id.home_switch_change_btn).setOnClickListener(this);
+        findViewById(R.id.home_lost_switch_btn).setOnClickListener(this);
 
         mSwitchMusic = new ArrayList<>();
         mDownMusic = new ArrayList<>();
@@ -234,6 +240,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             if (response.body() != null) {
                                 for (int i = 0; i < response.body().getData().getBannerList().size(); i++) {
                                     String url = response.body().getData().getBannerList().get(i).getImageUrl();
+                                    Log.e("BANNER", url);
                                     data.add(url);
                                 }
                                 BannerPagerAdapter scrollAdapter = new BannerPagerAdapter(BottomMenuActivity.this, data);
@@ -254,6 +261,8 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         if (Realm.getDefaultInstance() != null) {
             realm = Realm.getDefaultInstance();
         }
+
+//        onLostSwitch();
     }
 
     @Override
@@ -373,8 +382,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     } else {
                                         isUserCheck = false;
                                     }
-                                    mSearchContainer.setVisibility(View.GONE);
-                                    mInfoContainer.setVisibility(View.VISIBLE);
                                     String SERVICE_UUID = gatt.getServices().get(2).getUuid().toString();
                                     String CHARACTERISTIC_UUID = gatt.getServices().get(2).getCharacteristics().get(1).getUuid().toString();
                                     Log.e("SERVICE UUID", SERVICE_UUID);
@@ -431,7 +438,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onScanStarted(boolean success) {
                 mHomeDialog.setVisibility(View.VISIBLE);
-                Toast.makeText(BottomMenuActivity.this, "Scanning...", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -441,7 +447,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
             @Override
             public void onScanning(BleDevice bleDevice) {
-                if (bleDevice.getName() != null && bleDevice.getName().equals("Cartion") && bleDevice.getRssi() > -65) {
+                if (bleDevice.getName() != null && bleDevice.getName().equals("Cartion")) {
 //                    Log.e("CARTION", bleDevice.getName());
                     BleManager.getInstance().cancelScan();
                     connect(bleDevice);
@@ -456,6 +462,8 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 if (mBleDevice != null) {
                     mac = mBleDevice.getMac();
                     Log.e("MAC", mac);
+                } else {
+                    Toast.makeText(BottomMenuActivity.this, "검색되는 카션이 없습니다.", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -511,13 +519,17 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                mHomeDialog.setVisibility(View.GONE);
 //                                Log.e("NOTIFY", HexUtil.formatHexString(data, true));
                                 String s = new String(data);
 //                                Log.e("NOTIFY DATA 1", s);
                                 Log.e("NOTIFIED", s);
-                                if (s.startsWith("ca") || s.startsWith("00")) {
+                                if (s.startsWith("ca") || s.startsWith("FF")) {
+                                    onVersionCheck();
                                     serial = s;
-                                    Log.e("SERIAL NUM", serial);
+                                }
+
+                                if (s.startsWith("FwVer")) {
                                     if (BleManager.getInstance().isConnected(mBleDevice)) {
                                         ExecutorService es = Executors.newSingleThreadExecutor();
                                         es.submit(new Runnable() {
@@ -526,7 +538,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                                 writeData(mBleDevice,
                                                         "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                                                         "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
-                                                        onEmailPost(email.substring(0, email.indexOf("@")))
+                                                        onEmailPost("id1:" + email.substring(0, email.indexOf("@")))
                                                 );
                                             }
                                         });
@@ -536,7 +548,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                                 writeData(mBleDevice,
                                                         "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                                                         "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
-                                                        onAddressPost(email.substring(email.indexOf("@") + 1))
+                                                        onAddressPost("id2:" + email.substring(email.indexOf("@") + 1))
                                                 );
                                             }
                                         });
@@ -544,14 +556,15 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     }
                                 }
 
-                                if (isUserCheck && s.equals("Success")) {
-                                    Log.e("CARTION STATUS", "카션등록");
+                                if (s.equals("Success")) {
+                                    mSearchContainer.setVisibility(View.GONE);
+                                    mInfoContainer.setVisibility(View.VISIBLE);
                                     mRetInterface.postCartion(token, email, new Cartion(serial, mac, "Cartion"))
                                             .enqueue(new Callback<MyPage>() {
                                                 @Override
                                                 public void onResponse(Call<MyPage> call, Response<MyPage> response) {
                                                     if (response.code() == 200) {
-                                                        Toast.makeText(BottomMenuActivity.this, "카션이 등록되었습니다.", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(BottomMenuActivity.this, "카션이 등록되었습니다.", Toast.LENGTH_LONG).show();
                                                     }
                                                 }
 
@@ -560,9 +573,10 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
                                                 }
                                             });
-                                } else if (!isUserCheck && s.equals("Failure")) {
-                                    Log.e("CARTION STATUS", "카션없음");
-                                    Toast.makeText(BottomMenuActivity.this, "주변에 등록된 카션이 없습니다.", Toast.LENGTH_SHORT).show();
+                                } else if (s.equals("Failure")) {
+                                    Toast.makeText(BottomMenuActivity.this, "다른 사용자 ID의 카션입니다.", Toast.LENGTH_LONG).show();
+                                    mSearchContainer.setVisibility(View.VISIBLE);
+                                    mInfoContainer.setVisibility(View.GONE);
                                 }
                                 if (s.contains("Battery Level")) {
                                     mBatteryText.setText(s.replace("Battery Level:", ""));
@@ -588,8 +602,11 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                         String s = new String(justWrite);
                         if (mProgressDialog != null) {
                             if (!s.contains("SDN") && !s.contains("PSD") && !s.contains("com") && !s.contains("net")) {
-                                Log.e("CURRENT", (int) ((double) current / (double) total * 100.0) + "");
+//                                Log.e("CURRENT", (int) ((double) current / (double) total * 100.0) + "");
                                 mProgressDialog.setProgress((int) ((double) current / (double) total * 100.0));
+                                if ((int) ((double) current / (double) total * 100.0) == 100) {
+                                    mProgressDialog.dismiss();
+                                }
                             }
                         }
                     }
@@ -601,19 +618,12 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 });
     }
 
-    private String clist;
-
     private void onSwitch() {
         mSwitchMusic.clear();
         for (int i = 0; i < 10; i++) {
-            mSwitchMusic.add(new UserMobile(email, i + 1, "기본", "배려/안전", "horn", String.valueOf(i + 1)));
+            mSwitchMusic.add(new UserMobile(email, i + 1, i, "기본", "배려/안전", "horn", String.valueOf(i + 1)));
         }
-        clist = "";
-        if (preferences != null) {
-            if (!preferences.getString("cswitch", "").equals("")) {
-                clist = preferences.getString("cswitch", "");
-            }
-        }
+
         mRetInterface.getMobileSwitch(token, email)
                 .enqueue(new Callback<MobileSwitch>() {
                     @Override
@@ -622,12 +632,12 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             if (response.body() != null) {
                                 int mobileSw = response.body().getData().getMobileSwitch();
                                 if (mobileSw == 0) {
-                                    m36Container.setVisibility(View.INVISIBLE);
+//                                    m36Container.setVisibility(View.INVISIBLE);
                                     m36PurchaseBtn.setVisibility(View.VISIBLE);
                                 } else if (mobileSw == 1) {
                                     m36Line.setVisibility(View.VISIBLE);
                                     m36Container.setVisibility(View.VISIBLE);
-                                    m710Container.setVisibility(View.INVISIBLE);
+//                                    m710Container.setVisibility(View.INVISIBLE);
                                     m710PurchaseBtn.setVisibility(View.VISIBLE);
                                 } else if (mobileSw == 2) {
                                     m36Line.setVisibility(View.VISIBLE);
@@ -642,13 +652,10 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     String hornId = list.get(i).getHornId();
                                     String hornName = list.get(i).getHornName();
                                     String categoryName = list.get(i).getCategoryName();
-                                    int seq = list.get(i).getMobileSwitch();
+                                    int mobileSwitch = list.get(i).getMobileSwitch();
+                                    int seq = list.get(i).getSeq();
                                     String type = list.get(i).getType();
-                                    if (clist.equals("")) {
-                                        mSwitchMusic.set(i, new UserMobile(email, seq, hornName, categoryName, hornType, hornId));
-                                    } else {
-                                        mSwitchMusic.set(Integer.parseInt(clist.substring(i, i + 1)), new UserMobile(email, seq, hornName, categoryName, hornType, hornId));
-                                    }
+                                    mSwitchMusic.set(seq - 1, new UserMobile(email, mobileSwitch, seq, hornName, categoryName, hornType, hornId));
                                 }
 
                                 mIotSwitchAdapter = new IotSwitchAdapter(mSwitchMusic);
@@ -702,7 +709,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onClick(View v) {
                 adapter.notifyDataSetChanged();
-                editor = preferences.edit();
                 mRetInterface.putMobileList(token, email, mSwitchMusic)
                         .enqueue(new Callback<MyPage>() {
                             @Override
@@ -715,8 +721,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     for (int i = 0; i < mSwitchMusic.size(); i++) {
                                         list += String.valueOf(mSwitchMusic.get(i).getMobileSwitch() - 1);
                                     }
-                                    editor.putString("cswitch", list);
-                                    editor.apply();
+                                    Log.e("CARTION POSITION", list);
                                     if (BleManager.getInstance().isConnected(mBleDevice)) {
                                         writeData(mBleDevice,
                                                 "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
@@ -741,13 +746,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                         });
             }
         });
-
-//        view.findViewById(R.id.change_cancel_btn).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                dialog.dismiss();
-//            }
-//        });
     }
 
     private byte[] onChange(String collection) {
@@ -811,7 +809,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.setMax(100);
                 mProgressDialog.show();
-//                Toast.makeText(getActivity(), "" + position, Toast.LENGTH_SHORT).show();
                 try {
                     convertStreamToByteArray(musicList.get(position).getFile());
                     onDownload(mBleDevice, musicList.get(position).getName(), index);
@@ -870,7 +867,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         Realm realm = Realm.getDefaultInstance();
         UserMobile data = realm.where(UserMobile.class).equalTo("hornName", downName).findFirst();
         if (data != null) {
-            mRetInterface.putMobileSw(token, email, index, new UserMobile(email, Integer.parseInt(index) + 1, data.getHornType(), data.getHornId()))
+            mRetInterface.putMobileSw(token, email, index, new UserMobile(email, data.getMobileSwitch(), Integer.parseInt(index) + 1, data.getHornType(), data.getHornId()))
                     .enqueue(new Callback<MyPage>() {
                         @Override
                         public void onResponse(Call<MyPage> call, Response<MyPage> response) {
@@ -978,6 +975,9 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
             case R.id.home_switch_change_btn:
                 onSwitchChange();
                 break;
+            case R.id.home_lost_switch_btn:
+                onLostSwitch();
+                break;
         }
     }
 
@@ -1018,7 +1018,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
                             onAction0("" + (position + 2))
-//                            onAction0("" + (mSwitchMusic.get(position).getMobileSwitch() + 2))
                     );
                 }
             }
@@ -1046,7 +1045,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
                             onAction0("" + (position + 5))
-//                            onAction0("" + (mSwitchMusic.get(position).getMobileSwitch() + 5))
                     );
                 }
             }
@@ -1063,6 +1061,96 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 onSoundChange("" + ((mSwitchMusic.get(position).getMobileSwitch() - 1) + 5));
             }
         });
+    }
+
+    private void onLostSwitch() {
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.dialog_lost_switch, null);
+
+        TextView messageText = view.findViewById(R.id.home_lost_message_text);
+
+        String message = messageText.getText().toString();
+        String str = "분실";
+        int start = message.indexOf(str);
+        int end = start + str.length();
+        SpannableString span = new SpannableString(message);
+        span.setSpan(new ForegroundColorSpan(getResources().getColor(android.R.color.holo_red_light)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(view);
+        AlertDialog dialog = builder.create();
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.height = 1200;
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setAttributes(lp);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        view.findViewById(R.id.home_lost_switch_no_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        view.findViewById(R.id.home_lost_switch_yes_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (BleManager.getInstance().isConnected(mBleDevice)) {
+                    writeData(mBleDevice,
+                            "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+                            "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+                            onLost()
+                    );
+                }
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private byte[] onLost() {
+        String dsi = "DSI:0";
+        int checksum = 0;
+
+        byte[] dsiBytes = dsi.getBytes();
+        Log.e("DSI", Arrays.toString(dsiBytes));
+        byte[] dataBytes = new byte[6];
+        for (int i = 0; i < dsiBytes.length; i++) {
+            Log.e("GET DSI", dsiBytes[i] + "");
+            dataBytes[i] = dsiBytes[i];
+            checksum += dsiBytes[i];
+        }
+        dataBytes[5] = (byte) (checksum % 256);
+        checksum = 0;
+        Log.e("DATA DSI", Arrays.toString(dataBytes));
+        return dataBytes;
+    }
+
+    private void onVersionCheck() {
+        if (BleManager.getInstance().isConnected(mBleDevice)) {
+            Log.e("COMMEND", "버전 확인");
+            writeData(mBleDevice,
+                    "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+                    "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+                    onVersion("AppVer:" + (getAndroidVersion() * 100))
+            );
+        }
+    }
+
+    private byte[] onVersion(String version) {
+        int checksum = 0;
+
+        byte[] bytes = version.getBytes();
+        byte[] dataBytes = new byte[version.length() + 1];
+        for (int i = 0; i < bytes.length; i++) {
+            dataBytes[i] = bytes[i];
+            checksum += bytes[i];
+        }
+        dataBytes[version.length()] = (byte) (checksum % 256);
+        checksum = 0;
+        return dataBytes;
     }
 
     private void onCheckPermission() {
@@ -1118,6 +1206,18 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 super.onBackPressed();
             }
         }
+    }
+
+    private int getAndroidVersion() {
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            String version = pInfo.versionName;
+            int version_code = pInfo.versionCode;
+            return version_code;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 1;
     }
 
     @Override

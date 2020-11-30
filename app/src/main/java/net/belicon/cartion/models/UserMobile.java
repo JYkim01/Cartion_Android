@@ -6,6 +6,7 @@ public class UserMobile extends RealmObject {
 
     private String userId;
     private int mobileSwitch;
+    private int seq;
     private String hornName;
     private String categoryName;
     private String hornType;
@@ -14,16 +15,18 @@ public class UserMobile extends RealmObject {
     public UserMobile() {
     }
 
-    public UserMobile(String userId, int mobileSwitch, String hornType, String hornId) {
+    public UserMobile(String userId, int mobileSwitch, int seq, String hornType, String hornId) {
         this.userId = userId;
         this.mobileSwitch = mobileSwitch;
+        this.seq = seq;
         this.hornType = hornType;
         this.hornId = hornId;
     }
 
-    public UserMobile(String userId, int mobileSwitch, String hornName, String categoryName, String hornType, String hornId) {
+    public UserMobile(String userId, int mobileSwitch, int seq, String hornName, String categoryName, String hornType, String hornId) {
         this.userId = userId;
         this.mobileSwitch = mobileSwitch;
+        this.seq = seq;
         this.hornName = hornName;
         this.categoryName = categoryName;
         this.hornType = hornType;
@@ -45,6 +48,14 @@ public class UserMobile extends RealmObject {
 
     public void setMobileSwitch(int mobileSwitch) {
         this.mobileSwitch = mobileSwitch;
+    }
+
+    public int getSeq() {
+        return seq;
+    }
+
+    public void setSeq(int seq) {
+        this.seq = seq;
     }
 
     public String getHornName() {
@@ -84,6 +95,7 @@ public class UserMobile extends RealmObject {
         return "UserMobile{" +
                 "userId='" + userId + '\'' +
                 ", mobileSwitch=" + mobileSwitch +
+                ", seq=" + seq +
                 ", hornName='" + hornName + '\'' +
                 ", categoryName='" + categoryName + '\'' +
                 ", hornType='" + hornType + '\'' +
