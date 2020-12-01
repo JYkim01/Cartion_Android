@@ -110,8 +110,10 @@ public class SignUpTwoActivity extends AppCompatActivity implements View.OnClick
                         if (response.code() == 200) {
                             isChecked = response.body().getData().getIsAvailable();
                             if (isChecked) {
+                                isChecked = true;
                                 Toast.makeText(SignUpTwoActivity.this, "사용하실 수 있습니다.", Toast.LENGTH_SHORT).show();
                             } else {
+                                isChecked = false;
                                 Toast.makeText(SignUpTwoActivity.this, "이미 존재하는 아이디 입니다.", Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -125,37 +127,40 @@ public class SignUpTwoActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void onCreateUser() {
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        phone = mPhoneEdit.getText().toString();
+        mAuth.getCurrentUser().sendEmailVerification()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                    public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            phone = mPhoneEdit.getText().toString();
-                            mAuth.getCurrentUser().sendEmailVerification()
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            Toast.makeText(SignUpTwoActivity.this, "이메일을 확인해주세요.", Toast.LENGTH_SHORT).show();
+                            mRetInterface.postJoin(new User(email, password, phone))
+                                    .enqueue(new Callback<Login>() {
                                         @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                Toast.makeText(SignUpTwoActivity.this, "이메일을 확인해주세요.", Toast.LENGTH_SHORT).show();
-                                                mRetInterface.postJoin(new User(email, password, phone))
-                                                        .enqueue(new Callback<Login>() {
+                                        public void onResponse(Call<Login> call, Response<Login> response) {
+                                            Log.e("SignUp", response.code() + "");
+                                            if (response.code() == 201 || response.code() == 200) {
+                                                mAuth.createUserWithEmailAndPassword(email, password)
+                                                        .addOnCompleteListener(SignUpTwoActivity.this, new OnCompleteListener<AuthResult>() {
                                                             @Override
-                                                            public void onResponse(Call<Login> call, Response<Login> response) {
-                                                                if (response.code() == 201) {
+                                                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                                                if (task.isSuccessful()) {
                                                                     finish();
+                                                                } else {
+                                                                    Log.e("SIGN UP", "회원가입 실패: " + task.getException());
                                                                 }
                                                             }
-
-                                                            @Override
-                                                            public void onFailure(Call<Login> call, Throwable t) {
-                                                                Toast.makeText(SignUpTwoActivity.this, "" + t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                                                            }
                                                         });
+                                            } else {
+                                                Toast.makeText(SignUpTwoActivity.this, "회원가입이 실패하였습니다.", Toast.LENGTH_SHORT).show();
                                             }
                                         }
+
+                                        @Override
+                                        public void onFailure(Call<Login> call, Throwable t) {
+                                            Toast.makeText(SignUpTwoActivity.this, "" + t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                                        }
                                     });
-                        } else {
-                            Log.e("SIGN UP", "회원가입 실패: " + task.getException());
                         }
                     }
                 });

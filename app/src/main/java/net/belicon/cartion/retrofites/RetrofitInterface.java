@@ -23,6 +23,7 @@ import net.belicon.cartion.models.UserMobileList;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -62,6 +63,9 @@ public interface RetrofitInterface {
     @Headers("Content-Type: application/json")
     @GET("/api/customHorns")
     Call<Horn> getMyMusicList(@Header("Authorization") String token);
+
+    @GET("api/horn/ADPCM/{hornId}/")
+    Call<ResponseBody> getADPCM(@Header("Authorization") String token, @Path("hornId") String hornId);
 
     @GET("api/{userId}/horn")
     Call<MobileSwitch> getMobileSwitch(@Header("Authorization") String token, @Path("userId") String userId);

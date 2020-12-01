@@ -556,7 +556,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     }
                                 }
 
-                                if (s.equals("Success")) {
+                                if (s.equals("Success") || s.equals("Free Passage")) {
                                     mSearchContainer.setVisibility(View.GONE);
                                     mInfoContainer.setVisibility(View.VISIBLE);
                                     mRetInterface.postCartion(token, email, new Cartion(serial, mac, "Cartion"))
@@ -771,7 +771,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         View view = inflater.inflate(R.layout.dialog_download, null);
         RecyclerView recyclerView = view.findViewById(R.id.download_list_recycler_view);
         List<Down> musicList = new ArrayList<>();
-        File file = new File(getExternalFilesDir(null).getAbsolutePath());
+        File file = new File(String.valueOf(getExternalFilesDir(null)));
         File[] files = file.listFiles();
         for (File tempFile : files) {
             String hornId = "";

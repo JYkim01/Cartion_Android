@@ -24,17 +24,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.belicon.cartion.R;
 import net.belicon.cartion.models.HornList;
 import net.belicon.cartion.models.UserMobile;
+import net.belicon.cartion.retrofites.RetrofitClient;
+import net.belicon.cartion.retrofites.RetrofitInterface;
+import net.belicon.cartion.retrofites.RetrofitUtility;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.realm.Realm;
+import okhttp3.ResponseBody;
+import okio.Utf8;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.MusicListViewHolder> {
 
+    private RetrofitInterface retrofit;
     private List<HornList> mMusicList;
     private List<String> mDownList;
     private String mEmail, mAuth, type;
@@ -48,17 +63,20 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
         @Override
         public void onReceive(Context context, Intent intent) {
             int id = (int) intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+            Log.e("TEST", id + "");
             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction())) {
                 if (downloadId == id) {
                     DownloadManager.Query query = new DownloadManager.Query();
                     query.setFilterById(id);
                     Cursor cursor = mDownloadManager.query(query);
+                    Log.e("CURSOR", cursor.getColumnNames().toString());
                     if (!cursor.moveToFirst()) {
                         return;
                     }
 
                     int columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
                     int status = cursor.getInt(columnIndex);
+                    Log.e("STATUS", "" + status);
                     if (status == DownloadManager.STATUS_SUCCESSFUL) {
                         Toast.makeText(context, "다운로드 완료", Toast.LENGTH_SHORT).show();
                     } else if (status == DownloadManager.STATUS_FAILED) {
@@ -71,7 +89,8 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
         }
     }
 
-    public MusicListAdapter(List<HornList> mMusicList, List<String> mDownList, String mEmail, String mAuth, String type) {
+    public MusicListAdapter(RetrofitInterface retrofit, List<HornList> mMusicList, List<String> mDownList, String mEmail, String mAuth, String type) {
+        this.retrofit = retrofit;
         this.mMusicList = mMusicList;
         this.mDownList = mDownList;
         this.mEmail = mEmail;
@@ -131,25 +150,42 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
         holder.mMusicDownloadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isChecked = false;
                 if (mDownList.contains(mMusicList.get(position).getHornName() + ".wav")) {
                     Toast.makeText(holder.mMusicDownloadBtn.getContext(), "이미 존재하는 음원입니다.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Uri downloadUri = Uri.parse("https://api.cartion.co.kr:9983/api/horn/ADPCM/" + mMusicList.get(position).getHornId() + "/");
-                    Realm realm = Realm.getDefaultInstance();
-                    realm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-//                            mUserData.add(new UserMobile(mEmail, 0, "horn", mMusicList.get(position).getHornId()));
-                            UserMobile data = realm.createObject(UserMobile.class);
-                            data.setUserId(mEmail);
-                            data.setMobileSwitch(0);
-                            data.setHornName(mMusicList.get(position).getHornName() + ".wav");
-                            data.setHornType(type);
-                            data.setHornId(mMusicList.get(position).getHornId());
-                        }
-                    });
-                    downloadFile(holder.mMusicDownloadBtn.getContext(), mAuth, downloadUri, mMusicList.get(position).getHornName());
+                    retrofit.getADPCM(mAuth, mMusicList.get(position).getHornId())
+                            .enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    Log.e("DOWN RESPONSE", "" + response.code());
+                                    if (response.code() == 200) {
+                                        writeResponseBodyToDisk(holder.mMusicDownloadBtn.getContext(), response.body(), mMusicList.get(position).getHornName());
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                }
+                            });
+//                    String uriString = "https://api.cartion.co.kr:9983/api/horn/ADPCM/" + mMusicList.get(position).getHornId() + "/";
+//                    Uri downloadUri = Uri.parse(uriString);
+//
+//                    Realm realm = Realm.getDefaultInstance();
+//                    realm.executeTransaction(new Realm.Transaction() {
+//                        @Override
+//                        public void execute(Realm realm) {
+////                            mUserData.add(new UserMobile(mEmail, 0, "horn", mMusicList.get(position).getHornId()));
+//                            UserMobile data = realm.createObject(UserMobile.class);
+//                            data.setUserId(mEmail);
+//                            data.setMobileSwitch(0);
+//                            data.setHornName(mMusicList.get(position).getHornName() + ".wav");
+//                            data.setHornType(type);
+//                            data.setHornId(mMusicList.get(position).getHornId());
+//                        }
+//                    });
+//
+//                    downloadFile(holder.mMusicDownloadBtn.getContext(), mAuth, downloadUri, mMusicList.get(position).getHornId());
                 }
             }
         });
@@ -184,7 +220,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
         context.registerReceiver(new OnDownloadComplete(), intentFilter);
 
         mDownloadManager = (DownloadManager) context.getSystemService(context.DOWNLOAD_SERVICE);
-        File file = new File(context.getExternalFilesDir(null).getAbsolutePath(), name + ".wav");
+        File file = new File(context.getExternalFilesDir(null), "abc" + ".wav");
 
         DownloadManager.Request request = new DownloadManager.Request(url)
                 .addRequestHeader("Authorization", user)
@@ -198,5 +234,56 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
 
         downloadId = (int) mDownloadManager.enqueue(request);
         Log.e("PATH", file.getPath());
+    }
+
+    private boolean writeResponseBodyToDisk(Context context, ResponseBody body, String name) {
+        try {
+            // todo change the file location/name according to your needs
+            File futureStudioIconFile = new File(context.getExternalFilesDir(null), name + ".wav");
+
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+
+            try {
+                byte[] fileReader = new byte[4096];
+
+                long fileSize = body.contentLength();
+                long fileSizeDownloaded = 0;
+
+                inputStream = body.byteStream();
+                outputStream = new FileOutputStream(futureStudioIconFile);
+
+                while (true) {
+                    int read = inputStream.read(fileReader);
+
+                    if (read == -1) {
+                        break;
+                    }
+
+                    outputStream.write(fileReader, 0, read);
+
+                    fileSizeDownloaded += read;
+
+                    Log.d("File Download: " , fileSizeDownloaded + " of " + fileSize);
+                }
+
+                outputStream.flush();
+
+                return true;
+            } catch (IOException e) {
+                return false;
+            } finally {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+                Toast.makeText(context, "다운로드 완료.", Toast.LENGTH_SHORT).show();
+            }
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

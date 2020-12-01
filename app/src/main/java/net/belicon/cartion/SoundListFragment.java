@@ -153,7 +153,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                                 for (int i = 0; i < item.size(); i++) {
                                     mMusicList.add(new HornList(item.get(i).getHornId(), item.get(i).getHornName(), item.get(i).getWavPath(), item.get(i).getAdpcmPath()));
                                 }
-                                mAdapter = new MusicListAdapter(mMusicList, mDownList, email, token, type);
+                                mAdapter = new MusicListAdapter(mRetInterface, mMusicList, mDownList, email, token, type);
                                 mSoundListRecyclerView.setAdapter(mAdapter);
                             }
                         }
@@ -258,6 +258,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                 limit = 10;
                 mSoundListTabLayout.selectTab(mSoundListTabLayout.getTabAt(0));
                 onSoundResponse();
+                mMoreBtn.setVisibility(View.VISIBLE);
                 break;
             case R.id.sound_list_more_btn:
                 limit = 9999;
