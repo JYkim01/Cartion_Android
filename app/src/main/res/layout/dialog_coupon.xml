@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@android:color/white"
     android:clickable="true"
     android:focusable="true">
@@ -58,6 +59,7 @@
                         android:textSize="14.23sp" />
 
                     <EditText
+                        android:id="@+id/coupon_edit"
                         android:layout_width="170dp"
                         android:layout_height="50dp"
                         android:layout_marginTop="6dp"
@@ -66,9 +68,9 @@
                         android:gravity="center"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
-                        android:text="카 션"
                         android:textColor="@color/color_D9D9D9"
-                        android:textSize="20.88dp" />
+                        android:textSize="20.88dp"
+                        tools:text="카션"/>
 
                 </LinearLayout>
 

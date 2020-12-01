@@ -32,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -261,14 +262,11 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         if (Realm.getDefaultInstance() != null) {
             realm = Realm.getDefaultInstance();
         }
-
-//        onLostSwitch();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        Log.e("LIFE", "onResume");
         mHomeDialog.setVisibility(View.GONE);
         if (realm.where(UserMobile.class).findAll().size() != 0) {
             mDownMusic = realm.where(UserMobile.class).findAll();
@@ -336,29 +334,34 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         window.setAttributes(lp);
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+        EditText coupon = view.findViewById(R.id.coupon_edit);
         view.findViewById(R.id.coupon_confirm_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRetInterface.putCoupon(token, email, value)
-                        .enqueue(new Callback<MyPage>() {
-                            @Override
-                            public void onResponse(Call<MyPage> call, Response<MyPage> response) {
-                                if (response.code() == 200) {
-                                    if (response.body() != null) {
-                                        Toast.makeText(BottomMenuActivity.this, "쿠폰을 정상적으로 사용하였습니다.", Toast.LENGTH_SHORT).show();
+                if (coupon.getText().toString().equals("카션")) {
+                    mRetInterface.putCoupon(token, email, value)
+                            .enqueue(new Callback<MyPage>() {
+                                @Override
+                                public void onResponse(Call<MyPage> call, Response<MyPage> response) {
+                                    if (response.code() == 200) {
+                                        if (response.body() != null) {
+                                            Toast.makeText(BottomMenuActivity.this, "쿠폰을 정상적으로 사용하였습니다.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    } else {
+                                        Toast.makeText(BottomMenuActivity.this, "쿠폰 사용에 실패했습니다.", Toast.LENGTH_SHORT).show();
                                     }
-                                } else {
-                                    Toast.makeText(BottomMenuActivity.this, "쿠폰 사용에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
                                 }
-                                dialog.dismiss();
-                            }
 
-                            @Override
-                            public void onFailure(Call<MyPage> call, Throwable t) {
-                                Toast.makeText(BottomMenuActivity.this, "쿠폰 사용에 실패했습니다.", Toast.LENGTH_SHORT).show();
-                                dialog.dismiss();
-                            }
-                        });
+                                @Override
+                                public void onFailure(Call<MyPage> call, Throwable t) {
+                                    Toast.makeText(BottomMenuActivity.this, "쿠폰 사용에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                }
+                            });
+                } else {
+                    Toast.makeText(BottomMenuActivity.this, "쿠폰을 올바르게 입력해 주세요.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
