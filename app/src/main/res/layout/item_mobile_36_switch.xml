@@ -39,8 +39,8 @@
                 android:fontFamily="@font/scd6"
                 android:gravity="center_horizontal"
                 android:text="카션 안점음"
-                android:textColor="@color/color_7F44A6"
-                android:textSize="6.17sp" />
+                android:textColor="@color/color_A1AAB1"
+                android:textSize="9sp" />
 
             <TextView
                 android:id="@+id/item_36_switch_play_name"
@@ -50,13 +50,13 @@
                 android:layout_marginEnd="10dp"
                 android:layout_marginBottom="10dp"
                 android:layout_weight="1"
-                android:drawableEnd="@drawable/ic_sound_play_icon"
+                android:drawableEnd="@drawable/ic_home_play_button_disable"
                 android:drawablePadding="8dp"
-                android:fontFamily="@font/scd6"
+                android:fontFamily="@font/scd5"
                 android:gravity="center_vertical"
                 android:maxLines="3"
                 android:text="빵빵 양보해 주셔서 감사합니다"
-                android:textColor="@color/color_531F57"
+                android:textColor="@color/color_A1AAB1"
                 android:textSize="7.59sp" />
 
         </LinearLayout>

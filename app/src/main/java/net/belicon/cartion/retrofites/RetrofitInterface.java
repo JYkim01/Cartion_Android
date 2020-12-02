@@ -64,6 +64,9 @@ public interface RetrofitInterface {
     @GET("/api/customHorns")
     Call<Horn> getMyMusicList(@Header("Authorization") String token);
 
+    @GET("api/horn/wav/{hornId}/")
+    Call<ResponseBody> getPCM(@Header("Authorization") String token, @Path("hornId") String hornId);
+
     @GET("api/horn/ADPCM/{hornId}/")
     Call<ResponseBody> getADPCM(@Header("Authorization") String token, @Path("hornId") String hornId);
 
@@ -85,7 +88,7 @@ public interface RetrofitInterface {
     @PUT("api/{userId}/horn/{mobileSwitch}")
     Call<MyPage> putMobileSw(@Header("Authorization") String token, @Path("userId") String userId, @Path("mobileSwitch") String mobileSwitch, @Body UserMobile body);
 
-    @PUT("api/{userId}/horn")
+    @PUT("api/{userId}/horn-index")
     Call<MyPage> putMobileList(@Header("Authorization") String token, @Path("userId") String userId, @Body List<UserMobile> body);
 
     @GET("api/banners")

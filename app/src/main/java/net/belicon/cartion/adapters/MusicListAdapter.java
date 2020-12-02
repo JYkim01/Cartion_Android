@@ -5,11 +5,10 @@ import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,25 +23,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.belicon.cartion.R;
 import net.belicon.cartion.models.HornList;
 import net.belicon.cartion.models.UserMobile;
-import net.belicon.cartion.retrofites.RetrofitClient;
 import net.belicon.cartion.retrofites.RetrofitInterface;
-import net.belicon.cartion.retrofites.RetrofitUtility;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.realm.Realm;
 import okhttp3.ResponseBody;
-import okio.Utf8;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -54,40 +46,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
     private List<String> mDownList;
     private String mEmail, mAuth, type;
 
-    private int downloadId;
     private boolean isPlaying = false;
-
-    private DownloadManager mDownloadManager; //다운로드 매니저.
-
-    private class OnDownloadComplete extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int id = (int) intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-            Log.e("TEST", id + "");
-            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction())) {
-                if (downloadId == id) {
-                    DownloadManager.Query query = new DownloadManager.Query();
-                    query.setFilterById(id);
-                    Cursor cursor = mDownloadManager.query(query);
-                    Log.e("CURSOR", cursor.getColumnNames().toString());
-                    if (!cursor.moveToFirst()) {
-                        return;
-                    }
-
-                    int columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_STATUS);
-                    int status = cursor.getInt(columnIndex);
-                    Log.e("STATUS", "" + status);
-                    if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                        Toast.makeText(context, "다운로드 완료", Toast.LENGTH_SHORT).show();
-                    } else if (status == DownloadManager.STATUS_FAILED) {
-                        Toast.makeText(context, "다운로드 실패", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            } else if (DownloadManager.ACTION_NOTIFICATION_CLICKED.equals(intent.getAction())) {
-//                Toast.makeText(context, "Notification clicked", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
     public MusicListAdapter(RetrofitInterface retrofit, List<HornList> mMusicList, List<String> mDownList, String mEmail, String mAuth, String type) {
         this.retrofit = retrofit;
@@ -115,35 +74,25 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
         holder.mMusicPreviewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    Map<String, String> headers = new HashMap<>();
-                    headers.put("Content-Type", "application/x-www-form-urlencode");
-                    headers.put("Authorization", mAuth);
-
-                    MediaPlayer mediaPlayer = new MediaPlayer();
-                    mediaPlayer.setDataSource(holder.mMusicPreviewBtn.getContext(), Uri.parse("https://api.cartion.co.kr:9983/api/horn/wav/" + mMusicList.get(position).getHornId() + "/"), headers);
-                    mediaPlayer.prepare();
-                    mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                        @Override
-                        public void onPrepared(MediaPlayer mediaPlayer) {
-                            if (!isPlaying) {
-                                holder.mMusicTitleText.setTextColor(holder.mMusicPreviewBtn.getContext().getResources().getColor(R.color.color_7F44A6));
-                                mediaPlayer.start();
-                                isPlaying = true;
+                retrofit.getPCM(mAuth, mMusicList.get(position).getHornId())
+                        .enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                Log.e("PCM CODE", "" + response.code());
+                                if (response.code() == 200) {
+                                    try {
+                                        playWav(holder.mMusicPreviewBtn.getContext(), holder.mMusicTitleText, response.body().bytes(), mMusicList.get(position).getHornName());
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                             }
-                        }
-                    });
 
-                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mp) {
-                            isPlaying = false;
-                            holder.mMusicTitleText.setTextColor(Color.WHITE);
-                        }
-                    });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                            }
+                        });
             }
         });
 
@@ -159,6 +108,18 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
                                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                     Log.e("DOWN RESPONSE", "" + response.code());
                                     if (response.code() == 200) {
+                                        Realm realm = Realm.getDefaultInstance();
+                                        realm.executeTransaction(new Realm.Transaction() {
+                                            @Override
+                                            public void execute(Realm realm) {
+                                                UserMobile data = realm.createObject(UserMobile.class);
+                                                data.setUserId(mEmail);
+                                                data.setMobileSwitch(0);
+                                                data.setHornName(mMusicList.get(position).getHornName() + ".wav");
+                                                data.setHornType(type);
+                                                data.setHornId(mMusicList.get(position).getHornId());
+                                            }
+                                        });
                                         writeResponseBodyToDisk(holder.mMusicDownloadBtn.getContext(), response.body(), mMusicList.get(position).getHornName());
                                     }
                                 }
@@ -168,24 +129,6 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
 
                                 }
                             });
-//                    String uriString = "https://api.cartion.co.kr:9983/api/horn/ADPCM/" + mMusicList.get(position).getHornId() + "/";
-//                    Uri downloadUri = Uri.parse(uriString);
-//
-//                    Realm realm = Realm.getDefaultInstance();
-//                    realm.executeTransaction(new Realm.Transaction() {
-//                        @Override
-//                        public void execute(Realm realm) {
-////                            mUserData.add(new UserMobile(mEmail, 0, "horn", mMusicList.get(position).getHornId()));
-//                            UserMobile data = realm.createObject(UserMobile.class);
-//                            data.setUserId(mEmail);
-//                            data.setMobileSwitch(0);
-//                            data.setHornName(mMusicList.get(position).getHornName() + ".wav");
-//                            data.setHornType(type);
-//                            data.setHornId(mMusicList.get(position).getHornId());
-//                        }
-//                    });
-//
-//                    downloadFile(holder.mMusicDownloadBtn.getContext(), mAuth, downloadUri, mMusicList.get(position).getHornId());
                 }
             }
         });
@@ -210,30 +153,47 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
             mMusicTitleText = itemView.findViewById(R.id.item_sound_title_text);
             mMusicPreviewBtn = itemView.findViewById(R.id.item_sound_preview_btn);
             mMusicDownloadBtn = itemView.findViewById(R.id.item_sound_download_btn);
+
+            mMusicTitleText.setSelected(true);
         }
     }
 
-    private void downloadFile(Context context, String user, Uri url, String name) {
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
-        intentFilter.addAction(DownloadManager.ACTION_NOTIFICATION_CLICKED);
-        context.registerReceiver(new OnDownloadComplete(), intentFilter);
+    private void playWav(Context context, TextView nameTextView, byte[] mp3SoundByteArray, String name) {
+        try {
+            File path = new File(context.getCacheDir(), name + ".wav");
 
-        mDownloadManager = (DownloadManager) context.getSystemService(context.DOWNLOAD_SERVICE);
-        File file = new File(context.getExternalFilesDir(null), "abc" + ".wav");
+            FileOutputStream fos = new FileOutputStream(path);
+            fos.write(mp3SoundByteArray);
+            fos.close();
 
-        DownloadManager.Request request = new DownloadManager.Request(url)
-                .addRequestHeader("Authorization", user)
-                .setTitle("Downloading a Cartion")
-                .setDescription("Downloading...")
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-                .setDestinationUri(Uri.fromFile(file))
-                .setRequiresCharging(false)
-                .setAllowedOverMetered(true)
-                .setAllowedOverRoaming(true);
+            MediaPlayer mediaPlayer = new MediaPlayer();
 
-        downloadId = (int) mDownloadManager.enqueue(request);
-        Log.e("PATH", file.getPath());
+            FileInputStream fis = new FileInputStream(path);
+            mediaPlayer.setDataSource(context.getCacheDir() + "/" + name + ".wav");
+
+            mediaPlayer.prepare();
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    if (!isPlaying) {
+                        nameTextView.setTextColor(nameTextView.getContext().getResources().getColor(R.color.color_7F44A6));
+                        mediaPlayer.start();
+                        isPlaying = true;
+                    }
+                }
+            });
+
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    nameTextView.setTextColor(Color.WHITE);
+                    isPlaying = false;
+                }
+            });
+        } catch (IOException ex) {
+            String s = ex.toString();
+            ex.printStackTrace();
+        }
     }
 
     private boolean writeResponseBodyToDisk(Context context, ResponseBody body, String name) {
@@ -264,7 +224,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
 
                     fileSizeDownloaded += read;
 
-                    Log.d("File Download: " , fileSizeDownloaded + " of " + fileSize);
+                    Log.d("File Download: ", fileSizeDownloaded + " of " + fileSize);
                 }
 
                 outputStream.flush();

@@ -2,7 +2,9 @@ package net.belicon.cartion;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +23,11 @@ public class SignUpOneActivity extends AppCompatActivity implements View.OnClick
 
     private RetrofitInterface mRetInterface;
 
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor editor;
+
+    private String token;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,12 +40,18 @@ public class SignUpOneActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onClick(View v) {
+        preferences = getSharedPreferences("login_key", Context.MODE_PRIVATE);
+        editor = preferences.edit();
         mRetInterface.putAgreement("Bearer " + User.getUserToken())
                 .enqueue(new Callback<Login>() {
                     @Override
                     public void onResponse(Call<Login> call, Response<Login> response) {
                         Log.e("AGREEMENT CODE", "" + response.code());
                         if (response.code() == 200) {
+                            token = response.body().getData().getToken().getRefreshToken();
+                            User.setUserToken(token);
+                            editor.putString("token", token);
+                            editor.apply();
                             startActivity(new Intent(SignUpOneActivity.this, BottomMenuActivity.class));
                             finish();
                         }

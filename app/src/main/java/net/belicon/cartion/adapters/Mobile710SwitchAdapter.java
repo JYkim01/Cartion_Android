@@ -74,6 +74,7 @@ public class Mobile710SwitchAdapter extends RecyclerView.Adapter<Mobile710Switch
                     if (pos != RecyclerView.NO_POSITION) {
                         if (mListener != null) {
                             mListener.on710ClickListener(v, pos);
+                            mNameText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_sound_play_icon, 0, 0, 0);
                         }
                     }
                 }

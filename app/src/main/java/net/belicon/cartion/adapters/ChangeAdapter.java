@@ -44,7 +44,7 @@ public class ChangeAdapter extends RecyclerView.Adapter<ChangeAdapter.ChangeView
     @NonNull
     @Override
     public ChangeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ChangeViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_download, parent, false));
+        return new ChangeViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_change, parent, false));
     }
 
     @Override
@@ -88,8 +88,8 @@ public class ChangeAdapter extends RecyclerView.Adapter<ChangeAdapter.ChangeView
         public ChangeViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            mMusicPositionText = itemView.findViewById(R.id.item_download_position_text);
-            mMusicTitleText = itemView.findViewById(R.id.item_download_title_text);
+            mMusicPositionText = itemView.findViewById(R.id.item_change_position_text);
+            mMusicTitleText = itemView.findViewById(R.id.item_change_title_text);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

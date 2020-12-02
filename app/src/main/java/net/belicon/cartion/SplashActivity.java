@@ -25,6 +25,13 @@ import net.belicon.cartion.models.User;
 import net.belicon.cartion.retrofites.RetrofitInterface;
 import net.belicon.cartion.retrofites.RetrofitUtility;
 
+import io.realm.DynamicRealm;
+import io.realm.FieldAttribute;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmMigration;
+import io.realm.RealmObjectSchema;
+import io.realm.RealmSchema;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -52,6 +59,33 @@ public class SplashActivity extends AppCompatActivity {
         mSplashImage = findViewById(R.id.splash_image);
 
         mRetInterface = RetrofitUtility.getRetrofitInterface();
+
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .schemaVersion(2)
+                .migration(new RealmMigration() {
+                    @Override
+                    public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                        RealmSchema schema = realm.getSchema();
+                        if (newVersion == 1) {
+                            RealmObjectSchema mUserMobileSchema = schema.get("UserMobile");
+                            if (mUserMobileSchema != null) {
+                                mUserMobileSchema.addField("categoryName", String.class, (FieldAttribute) null);
+                            }
+
+                            oldVersion++;
+                        } else if (newVersion == 2) {
+                            RealmObjectSchema mUserMobileSchema = schema.get("UserMobile");
+                            if (mUserMobileSchema != null) {
+                                mUserMobileSchema.addField("seq", int.class, (FieldAttribute) null);
+                            }
+
+                            oldVersion++;
+                        }
+                    }
+                })
+                .build();
+        Realm.setDefaultConfiguration(config);
 
         Handler mHandler = new Handler();
         if (mAuth.getCurrentUser() != null) {

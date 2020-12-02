@@ -145,33 +145,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         onCheckPermission();
         setContentView(R.layout.activity_bottom_menu);
 
-        Realm.init(this);
-        RealmConfiguration config = new RealmConfiguration.Builder()
-                .schemaVersion(2)
-                .migration(new RealmMigration() {
-                    @Override
-                    public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
-                        RealmSchema schema = realm.getSchema();
-                        if (newVersion == 1) {
-                            RealmObjectSchema mUserMobileSchema = schema.get("UserMobile");
-                            if (mUserMobileSchema != null) {
-                                mUserMobileSchema.addField("categoryName", String.class, (FieldAttribute) null);
-                            }
-
-                            oldVersion++;
-                        } else if (newVersion == 2) {
-                            RealmObjectSchema mUserMobileSchema = schema.get("UserMobile");
-                            if (mUserMobileSchema != null) {
-                                mUserMobileSchema.addField("seq", int.class, (FieldAttribute) null);
-                            }
-
-                            oldVersion++;
-                        }
-                    }
-                })
-                .build();
-        Realm.setDefaultConfiguration(config);
-
         mBannerPager = findViewById(R.id.bottom_main_banner);
         mHomeBtn = findViewById(R.id.bottom_home_btn);
         mMusicBtn = findViewById(R.id.bottom_music_btn);
@@ -258,16 +231,17 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
         mHomeBtn.setChecked(true);
         onCoupon();
-
-        if (Realm.getDefaultInstance() != null) {
-            realm = Realm.getDefaultInstance();
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mHomeDialog.setVisibility(View.GONE);
+
+        if (Realm.getDefaultInstance() != null) {
+            realm = Realm.getDefaultInstance();
+        }
+
         if (realm.where(UserMobile.class).findAll().size() != 0) {
             mDownMusic = realm.where(UserMobile.class).findAll();
         }
@@ -658,7 +632,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     int mobileSwitch = list.get(i).getMobileSwitch();
                                     int seq = list.get(i).getSeq();
                                     String type = list.get(i).getType();
-                                    mSwitchMusic.set(seq - 1, new UserMobile(email, mobileSwitch, seq, hornName, categoryName, hornType, hornId));
+                                    mSwitchMusic.set(i, new UserMobile(email, mobileSwitch, i + 1, hornName, categoryName, hornType, hornId));
                                 }
 
                                 mIotSwitchAdapter = new IotSwitchAdapter(mSwitchMusic);
@@ -712,12 +686,20 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onClick(View v) {
                 adapter.notifyDataSetChanged();
+                for (int i = 0; i < mSwitchMusic.size(); i++) {
+                    String hornType = mSwitchMusic.get(i).getHornType();
+                    String hornId = mSwitchMusic.get(i).getHornId();
+                    String hornName = mSwitchMusic.get(i).getHornName();
+                    String categoryName = mSwitchMusic.get(i).getCategoryName();
+                    int mobileSwitch = mSwitchMusic.get(i).getMobileSwitch();
+                    mSwitchMusic.set(i, new UserMobile(email, mobileSwitch, i + 1, hornName, categoryName, hornType, hornId));
+                }
                 mRetInterface.putMobileList(token, email, mSwitchMusic)
                         .enqueue(new Callback<MyPage>() {
                             @Override
                             public void onResponse(Call<MyPage> call, Response<MyPage> response) {
-//                                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//                                Log.e("TEST", gson.toJson(mSwitchMusic));
+                                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                                Log.e("TEST", gson.toJson(mSwitchMusic));
                                 Log.e("CHANGE", response.code() + "");
                                 if (response.code() == 200) {
                                     String list = "";
@@ -789,7 +771,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
             }
             musicList.add(new Down(tempFile.getName(), tempFile, hornId));
         }
-        DownloadAdapter adapter = new DownloadAdapter(musicList, token);
+        DownloadAdapter adapter = new DownloadAdapter(musicList, token, mRetInterface);
         recyclerView.setAdapter(adapter);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(view);
@@ -1172,7 +1154,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             TedPermission.with(this)
                     .setPermissionListener(permissionlistener)
-                    .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                    .setDeniedMessage("권한을 거부 할 경우 본 서비스를 이용하실 수 없습니다.\n\n[설정]> [권한]에서 권한을 켜주세요.")
                     .setPermissions(Manifest.permission.BLUETOOTH,
                             Manifest.permission.BLUETOOTH_ADMIN,
                             Manifest.permission.ACCESS_BACKGROUND_LOCATION,
@@ -1184,7 +1166,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         } else {
             TedPermission.with(this)
                     .setPermissionListener(permissionlistener)
-                    .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                    .setDeniedMessage("권한을 거부 할 경우 본 서비스를 이용하실 수 없습니다.\n\n[설정]> [권한]에서 권한을 켜주세요.")
                     .setPermissions(Manifest.permission.BLUETOOTH,
                             Manifest.permission.BLUETOOTH_ADMIN,
                             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -1197,16 +1179,21 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onBackPressed() {
-        if (pressedTime == 0) {
-            Toast.makeText(this, "한번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show();
-            pressedTime = System.currentTimeMillis();
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
         } else {
-            int seconds = (int) (System.currentTimeMillis() - pressedTime);
-
-            if (seconds > 2000) {
-                pressedTime = 0;
+            if (pressedTime == 0) {
+                Toast.makeText(this, "한번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show();
+                pressedTime = System.currentTimeMillis();
             } else {
-                super.onBackPressed();
+                int seconds = (int) (System.currentTimeMillis() - pressedTime);
+
+                if (seconds > 2000) {
+                    pressedTime = 0;
+                } else {
+//                    super.onBackPressed();
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                }
             }
         }
     }

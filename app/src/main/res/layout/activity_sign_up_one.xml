@@ -205,7 +205,7 @@
                     android:layout_marginEnd="15dp"
                     android:fontFamily="@font/scd4"
                     android:lineSpacingExtra="2dp"
-                    android:text="'카션'은 이용자의 정보 수집시 구매계약 이행에 필요한 최소한의 정보를 수집합니다.\n다음 사항을 필수사항으로 하며 그 외 사항은 선택사항으로 합니다.\n1. 희망ID(회원의 경우)\n2. 비밀번호(회원의 경우)\n3. 이메일주소"
+                    android:text="'카션'은 이용자의 정보 수집시 구매계약 이행에 필요한 최소한의 정보를 수집합니다.\n다음 사항을 필수사항으로 하며 그 외 사항은 선택사항으로 합니다.\n1. 이메일 주소\n2. 비밀번호\n3. 전화번호"
                     android:textColor="@color/color_606060"
                     android:textSize="11.39sp" />
 

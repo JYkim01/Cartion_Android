@@ -1,5 +1,6 @@
 package net.belicon.cartion.adapters;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.media.Image;
 import android.media.MediaPlayer;
@@ -16,15 +17,26 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.belicon.cartion.R;
 import net.belicon.cartion.models.Down;
+import net.belicon.cartion.retrofites.RetrofitInterface;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.DownloadViewHolder> {
 
     private OnDownClickListener mListener = null ;
+
+    private RetrofitInterface retrofit;
 
     private List<Down> mMusicList;
     private String mAuth;
@@ -39,9 +51,10 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
         this.mListener = listener ;
     }
 
-    public DownloadAdapter(List<Down> mMusicList, String mAuth) {
+    public DownloadAdapter(List<Down> mMusicList, String mAuth, RetrofitInterface retrofit) {
         this.mMusicList = mMusicList;
         this.mAuth = mAuth;
+        this.retrofit = retrofit;
     }
 
     @NonNull
@@ -61,35 +74,24 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
                 if (item.getHornId().equals("")) {
                     Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기가 불가능한 음원 입니다.", Toast.LENGTH_SHORT).show();
                 } else {
-                    try {
-                        Map<String, String> headers = new HashMap<>();
-                        headers.put("Content-Type", "application/x-www-form-urlencode");
-                        headers.put("Authorization", mAuth);
-
-                        MediaPlayer mediaPlayer = new MediaPlayer();
-                        mediaPlayer.setDataSource(holder.mMusicPreviewBtn.getContext(), Uri.parse("https://api.cartion.co.kr:9983/api/horn/wav/" + item.getHornId() + "/"), headers);
-                        mediaPlayer.prepare();
-                        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                            @Override
-                            public void onPrepared(MediaPlayer mediaPlayer) {
-                                if (!isPlaying) {
-                                    holder.mMusicTitleText.setTextColor(holder.mMusicPreviewBtn.getContext().getResources().getColor(R.color.color_7F44A6));
-                                    mediaPlayer.start();
-                                    isPlaying = true;
+                    retrofit.getPCM(mAuth, item.getHornId())
+                            .enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    if (response.code() == 200) {
+                                        try {
+                                            playWav(holder.mMusicPreviewBtn.getContext(), response.body().bytes(), item.getName());
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
                                 }
-                            }
-                        });
 
-                        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            @Override
-                            public void onCompletion(MediaPlayer mp) {
-                                isPlaying = false;
-                                holder.mMusicTitleText.setTextColor(Color.WHITE);
-                            }
-                        });
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                                }
+                            });
                 }
             }
         });
@@ -98,6 +100,28 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
     @Override
     public int getItemCount() {
         return mMusicList.size();
+    }
+
+    private void playWav(Context context, byte[] mp3SoundByteArray, String name) {
+        try {
+
+            File path = new File(context.getCacheDir(), name + ".wav");
+
+            FileOutputStream fos = new FileOutputStream(path);
+            fos.write(mp3SoundByteArray);
+            fos.close();
+
+            MediaPlayer mediaPlayer = new MediaPlayer();
+
+            FileInputStream fis = new FileInputStream(path);
+            mediaPlayer.setDataSource(context.getCacheDir() + "/" + name + ".wav");
+
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch (IOException ex) {
+            String s = ex.toString();
+            ex.printStackTrace();
+        }
     }
 
     public class DownloadViewHolder extends RecyclerView.ViewHolder {
