@@ -90,7 +90,7 @@ public class IotSwitchAdapter extends RecyclerView.Adapter<IotSwitchAdapter.IotS
                                     mNameText.setTextColor(mNameText.getContext().getResources().getColor(R.color.color_A1AAB1));
                                     mNameText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_home_play_button_disable, 0);
                                 }
-                            }, 5000);
+                            }, 500);
                         }
                     }
                 }

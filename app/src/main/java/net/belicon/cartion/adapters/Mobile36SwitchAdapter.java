@@ -1,5 +1,6 @@
 package net.belicon.cartion.adapters;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,6 +75,17 @@ public class Mobile36SwitchAdapter extends RecyclerView.Adapter<Mobile36SwitchAd
                     if (pos != RecyclerView.NO_POSITION) {
                         if (mListener != null) {
                             mListener.on36ClickListener(v, pos);
+                            mTypeText.setTextColor(mTypeText.getContext().getResources().getColor(R.color.color_7F44A6));
+                            mNameText.setTextColor(mNameText.getContext().getResources().getColor(R.color.color_531F57));
+                            mNameText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_sound_play_icon, 0);
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mTypeText.setTextColor(mTypeText.getContext().getResources().getColor(R.color.color_A1AAB1));
+                                    mNameText.setTextColor(mNameText.getContext().getResources().getColor(R.color.color_A1AAB1));
+                                    mNameText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_home_play_button_disable, 0);
+                                }
+                            }, 500);
                         }
                     }
                 }
