@@ -188,7 +188,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         BleManager.getInstance().init(getApplication());
         BleManager.getInstance()
                 .enableLog(true)
-                .setReConnectCount(1, 5000)
+                .setReConnectCount(3, 5000)
                 .setSplitWriteNum(17)
                 .setConnectOverTime(20000)
                 .setOperateTimeout(5000);
@@ -340,7 +340,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         });
     }
 
-    private void onServerDevice(BleDevice bleDevice, BluetoothGatt gatt) {
+    private void onServerDevice() {
         if (mAuth.getCurrentUser() != null) {
             mRetInterface.getUserData(token, mAuth.getCurrentUser().getEmail())
                     .enqueue(new Callback<MyPage>() {
@@ -354,17 +354,14 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     for (int i = 0; i < devices.size(); i++) {
                                         macList.add(devices.get(i).getDeviceMac());
                                     }
-                                    if (macList.contains(mBleDevice.getMac())) {
+                                    if (macList.size() != 0) {
                                         isUserCheck = true;
+                                        mac = devices.get(0).getDeviceMac();
+                                        Log.e("USER MAC", mac);
                                     } else {
                                         isUserCheck = false;
                                     }
-                                    String SERVICE_UUID = gatt.getServices().get(2).getUuid().toString();
-                                    String CHARACTERISTIC_UUID = gatt.getServices().get(2).getCharacteristics().get(1).getUuid().toString();
-                                    Log.e("SERVICE UUID", SERVICE_UUID);
-                                    Log.e("CHARACTERISTIC UUID", CHARACTERISTIC_UUID);
-                                    mNicNameText.setText(mBleDevice.getName());
-                                    notified(bleDevice, SERVICE_UUID, CHARACTERISTIC_UUID);
+                                    startScan();
                                 }
                             }
                         }
@@ -420,27 +417,43 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onLeScan(BleDevice bleDevice) {
                 super.onLeScan(bleDevice);
+
             }
 
             @Override
             public void onScanning(BleDevice bleDevice) {
-                if (bleDevice.getName() != null && bleDevice.getName().equals("Cartion")) {
+//                if (isUserCheck) {
+                    if (bleDevice.getName() != null && bleDevice.getName().equals("Cartion")) {
 //                    Log.e("CARTION", bleDevice.getName());
-                    BleManager.getInstance().cancelScan();
-                    connect(bleDevice);
-                    mBleDevice = bleDevice;
-                    mHomeDialog.setVisibility(View.GONE);
-                }
+//                        BleManager.getInstance().cancelScan();
+//                        connect(bleDevice);
+//                        Log.e("CartionMac", bleDevice.getMac());
+//                        mBleDevice = bleDevice;
+//                        mHomeDialog.setVisibility(View.GONE);
+//                    }
+//                } else {
+//                    if (bleDevice.getName() != null && bleDevice.getName().equals("Cartion") && bleDevice.getRssi() > -60) {
+//                    Log.e("CARTION", bleDevice.getName());
+                        BleManager.getInstance().cancelScan();
+                        connect(bleDevice);
+                        mBleDevice = bleDevice;
+                        mHomeDialog.setVisibility(View.GONE);
+                    }
+//                }
             }
 
             @Override
             public void onScanFinished(List<BleDevice> scanResultList) {
                 mHomeDialog.setVisibility(View.GONE);
-                if (mBleDevice != null) {
+//                if (mBleDevice != null) {
+//                } else {
+//                    Toast.makeText(BottomMenuActivity.this, "검색되는 카션이 없습니다.", Toast.LENGTH_LONG).show();
+//                }
+                if (mBleDevice == null) {
+                    Toast.makeText(BottomMenuActivity.this, "검색되는 카션이 없습니다.", Toast.LENGTH_LONG).show();
+                } else {
                     mac = mBleDevice.getMac();
                     Log.e("MAC", mac);
-                } else {
-                    Toast.makeText(BottomMenuActivity.this, "검색되는 카션이 없습니다.", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -460,7 +473,12 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
-                onServerDevice(bleDevice, gatt);
+                String SERVICE_UUID = gatt.getServices().get(2).getUuid().toString();
+                String CHARACTERISTIC_UUID = gatt.getServices().get(2).getCharacteristics().get(1).getUuid().toString();
+                Log.e("SERVICE UUID", SERVICE_UUID);
+                Log.e("CHARACTERISTIC UUID", CHARACTERISTIC_UUID);
+                mNicNameText.setText(mBleDevice.getName());
+                notified(bleDevice, SERVICE_UUID, CHARACTERISTIC_UUID);
                 onSwitch();
             }
 
@@ -540,6 +558,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                             .enqueue(new Callback<MyPage>() {
                                                 @Override
                                                 public void onResponse(Call<MyPage> call, Response<MyPage> response) {
+                                                    Log.e("CARTION SUCCESS", "" + response.code());
                                                     if (response.code() == 200) {
                                                         Toast.makeText(BottomMenuActivity.this, "카션이 등록되었습니다.", Toast.LENGTH_LONG).show();
                                                     }
@@ -662,6 +681,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     int mobileSwitch = list.get(i).getMobileSwitch();
                                     int seq = list.get(i).getSeq();
                                     String type = list.get(i).getType();
+                                    Log.e("SwP", mobileSwitch + "");
                                     mSwitchMusic.set(i, new UserMobile(email, mobileSwitch, i + 1, hornName, categoryName, hornType, hornId));
                                 }
 
@@ -985,7 +1005,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.home_cartion_search_btn:
                 BleManager.getInstance().disconnectAllDevice();
-                startScan();
+                onServerDevice();
                 break;
             case R.id.home_switch_change_btn:
                 onSwitchChange();
@@ -1046,7 +1066,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             onCommend0("" + ((mSwitchMusic.get(position).getMobileSwitch() - 1) + 2))
                     );
                 }
-                onSoundChange("" + mSwitchMusic.get(position).getMobileSwitch(), "" + (position + 3));
+                onSoundChange("" + mSwitchMusic.get(position + 2).getMobileSwitch(), "" + (position + 3));
             }
         });
     }
@@ -1073,7 +1093,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             onCommend0("" + ((mSwitchMusic.get(position).getMobileSwitch() - 1) + 5))
                     );
                 }
-                onSoundChange("" + mSwitchMusic.get(position).getMobileSwitch(), "" + (position + 6));
+                onSoundChange("" + mSwitchMusic.get(position + 5).getMobileSwitch(), "" + (position + 6));
             }
         });
     }

@@ -226,7 +226,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
 
                     fileSizeDownloaded += read;
 
-                    Log.d("File Download: ", fileSizeDownloaded + " of " + fileSize);
+                    Log.e("File Download: ", fileSizeDownloaded + " of " + fileSize);
                 }
 
                 outputStream.flush();
