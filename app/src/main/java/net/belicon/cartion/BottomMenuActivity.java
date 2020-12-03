@@ -583,6 +583,36 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                 mProgressDialog.setProgress((int) ((double) current / (double) total * 100.0));
                                 if ((int) ((double) current / (double) total * 100.0) == 100) {
                                     mProgressDialog.dismiss();
+                                    mRetInterface.getMobileSwitch(token, email)
+                                            .enqueue(new Callback<MobileSwitch>() {
+                                                @Override
+                                                public void onResponse(Call<MobileSwitch> call, Response<MobileSwitch> response) {
+                                                    if (response.code() == 200) {
+                                                        if (response.body() != null) {
+                                                            List<SwitchList> list = response.body().getData().getHornList();
+                                                            for (int i = 0; i < list.size(); i++) {
+                                                                String userId = list.get(i).getUserId();
+                                                                String hornType = list.get(i).getHornType();
+                                                                String hornId = list.get(i).getHornId();
+                                                                String hornName = list.get(i).getHornName();
+                                                                String categoryName = list.get(i).getCategoryName();
+                                                                int mobileSwitch = list.get(i).getMobileSwitch();
+                                                                int seq = list.get(i).getSeq();
+                                                                String type = list.get(i).getType();
+                                                                mSwitchMusic.set(i, new UserMobile(email, mobileSwitch, i + 1, hornName, categoryName, hornType, hornId));
+                                                            }
+                                                            mIotSwitchAdapter.notifyDataSetChanged();
+                                                            mMobile36SwitchAdapter.notifyDataSetChanged();
+                                                            mMobile710SwitchAdapter.notifyDataSetChanged();
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<MobileSwitch> call, Throwable t) {
+
+                                                }
+                                            });
                                 }
                             }
                         }
@@ -751,7 +781,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         return dataBytes;
     }
 
-    private void onSoundChange(String index) {
+    private void onSoundChange(String mobileSwitch, String index) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.dialog_download, null);
         RecyclerView recyclerView = view.findViewById(R.id.download_list_recycler_view);
@@ -796,7 +826,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 mProgressDialog.show();
                 try {
                     convertStreamToByteArray(musicList.get(position).getFile());
-                    onDownload(mBleDevice, musicList.get(position).getName(), index);
+                    onDownload(mBleDevice, musicList.get(position).getName(), mobileSwitch, index);
                     dialog.dismiss();
                 } catch (IOException e) {
                     Log.e("ON DOWNLOAD", e.getLocalizedMessage());
@@ -848,11 +878,11 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         return tempList;
     }
 
-    private void onDownload(BleDevice bleDevice, String downName, String index) {
+    private void onDownload(BleDevice bleDevice, String downName, String mobileSwitch, String index) {
         Realm realm = Realm.getDefaultInstance();
         UserMobile data = realm.where(UserMobile.class).equalTo("hornName", downName).findFirst();
         if (data != null) {
-            mRetInterface.putMobileSw(token, email, index, new UserMobile(email, data.getMobileSwitch(), Integer.parseInt(index) + 1, data.getHornType(), data.getHornId()))
+            mRetInterface.putMobileSw(token, email, mobileSwitch, new UserMobile(email, Integer.parseInt(mobileSwitch), Integer.parseInt(index), data.getHornType(), data.getHornId()))
                     .enqueue(new Callback<MyPage>() {
                         @Override
                         public void onResponse(Call<MyPage> call, Response<MyPage> response) {
@@ -989,7 +1019,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             onCommend0("" + (mSwitchMusic.get(pos).getMobileSwitch() - 1))
                     );
                 }
-                onSoundChange("" + (mSwitchMusic.get(pos).getMobileSwitch() - 1));
+                onSoundChange("" + mSwitchMusic.get(pos).getMobileSwitch(), "" + (pos + 1));
             }
         });
     }
@@ -1016,7 +1046,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             onCommend0("" + ((mSwitchMusic.get(position).getMobileSwitch() - 1) + 2))
                     );
                 }
-                onSoundChange("" + ((mSwitchMusic.get(position).getMobileSwitch() - 1) + 2));
+                onSoundChange("" + mSwitchMusic.get(position).getMobileSwitch(), "" + (position + 3));
             }
         });
     }
@@ -1043,7 +1073,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             onCommend0("" + ((mSwitchMusic.get(position).getMobileSwitch() - 1) + 5))
                     );
                 }
-                onSoundChange("" + ((mSwitchMusic.get(position).getMobileSwitch() - 1) + 5));
+                onSoundChange("" + mSwitchMusic.get(position).getMobileSwitch(), "" + (position + 6));
             }
         });
     }

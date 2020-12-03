@@ -15,7 +15,7 @@ public class UserMobile extends RealmObject {
     public UserMobile() {
     }
 
-    public UserMobile(String userId, int mobileSwitch, int seq, String hornType, String hornId) {
+    public UserMobile(String userId, int mobileSwitch, int sqe, String hornType, String hornId) {
         this.userId = userId;
         this.mobileSwitch = mobileSwitch;
         this.seq = seq;

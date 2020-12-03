@@ -44,17 +44,18 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
     private RetrofitInterface retrofit;
     private List<HornList> mMusicList;
     private List<String> mDownList;
-    private String mEmail, mAuth, type;
+    private String mEmail, mAuth, type, categoryName;
 
     private boolean isPlaying = false;
 
-    public MusicListAdapter(RetrofitInterface retrofit, List<HornList> mMusicList, List<String> mDownList, String mEmail, String mAuth, String type) {
+    public MusicListAdapter(RetrofitInterface retrofit, List<HornList> mMusicList, List<String> mDownList, String mEmail, String mAuth, String type, String categoryName) {
         this.retrofit = retrofit;
         this.mMusicList = mMusicList;
         this.mDownList = mDownList;
         this.mEmail = mEmail;
         this.mAuth = mAuth;
         this.type = type;
+        this.categoryName = categoryName;
     }
 
     @NonNull
@@ -118,6 +119,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
                                                 data.setHornName(mMusicList.get(position).getHornName() + ".wav");
                                                 data.setHornType(type);
                                                 data.setHornId(mMusicList.get(position).getHornId());
+                                                data.setCategoryName(categoryName);
                                             }
                                         });
                                         writeResponseBodyToDisk(holder.mMusicDownloadBtn.getContext(), response.body(), mMusicList.get(position).getHornName());

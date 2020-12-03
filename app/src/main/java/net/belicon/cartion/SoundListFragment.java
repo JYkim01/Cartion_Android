@@ -51,7 +51,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
     private List<HornList> mMusicList;
     private List<String> mDownList;
 
-    private String token, email, categoryPos, type;
+    private String token, email, categoryPos, categoryName, type;
     private int offset = 0;
     private int limit = 10;
 
@@ -153,7 +153,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                                 for (int i = 0; i < item.size(); i++) {
                                     mMusicList.add(new HornList(item.get(i).getHornId(), item.get(i).getHornName(), item.get(i).getWavPath(), item.get(i).getAdpcmPath()));
                                 }
-                                mAdapter = new MusicListAdapter(mRetInterface, mMusicList, mDownList, email, token, type);
+                                mAdapter = new MusicListAdapter(mRetInterface, mMusicList, mDownList, email, token, type, categoryName);
                                 mSoundListRecyclerView.setAdapter(mAdapter);
                             }
                         }
@@ -173,6 +173,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                 } else {
                     categoryPos = "" + position;
                 }
+                categoryName = mCategorySpinner.getSelectedItem().toString();
             }
 
             @Override
@@ -180,16 +181,6 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
 
             }
         });
-//        mSoundListMaterialSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
-//                if (position == 0) {
-//                    categoryPos = "";
-//                } else {
-//                    categoryPos = "" + position;
-//                }
-//            }
-//        });
     }
 
     @Override
