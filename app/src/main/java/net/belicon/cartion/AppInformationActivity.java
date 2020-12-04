@@ -11,7 +11,7 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.TextView;
 
-public class AppInformationActivity extends AppCompatActivity {
+public class AppInformationActivity extends AppCompatActivity implements View.OnClickListener {
 
     private TextView mInfoVerText, mInfoPermissionText;
 
@@ -32,6 +32,17 @@ public class AppInformationActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        findViewById(R.id.app_info_eula_btn).setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.app_info_eula_btn:
+                startActivity(new Intent(this, EulaActivity.class));
+                break;
+        }
     }
 
     private int getAndroidVersion() {

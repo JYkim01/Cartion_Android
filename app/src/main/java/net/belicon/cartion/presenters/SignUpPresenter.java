@@ -97,6 +97,7 @@ public class SignUpPresenter implements MainConstants.OnSingUp {
                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                 if (task.isSuccessful()) {
                                                                     Toast.makeText(context, "이메일을 확인해주세요.", Toast.LENGTH_LONG).show();
+//                            Toast.makeText(context, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
                                                                     activity.finish();
                                                                 }
                                                             }

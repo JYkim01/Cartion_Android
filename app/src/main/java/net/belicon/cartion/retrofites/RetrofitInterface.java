@@ -26,6 +26,7 @@ import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
@@ -64,51 +65,54 @@ public interface RetrofitInterface {
     @GET("/api/customHorns")
     Call<Horn> getMyMusicList(@Header("Authorization") String token);
 
-    @GET("api/horn/wav/{hornId}/")
+    @GET("/api/horn/wav/{hornId}/")
     Call<ResponseBody> getPCM(@Header("Authorization") String token, @Path("hornId") String hornId);
 
-    @GET("api/horn/ADPCM/{hornId}/")
+    @GET("/api/horn/ADPCM/{hornId}/")
     Call<ResponseBody> getADPCM(@Header("Authorization") String token, @Path("hornId") String hornId);
 
-    @GET("api/{userId}/horn")
+    @GET("/api/{userId}/horn")
     Call<MobileSwitch> getMobileSwitch(@Header("Authorization") String token, @Path("userId") String userId);
 
-    @GET("api/user/{userId}")
+    @GET("/api/user/{userId}")
     Call<MyPage> getUserData(@Header("Authorization") String token, @Path("userId") String userId);
 
-    @PUT("api/user/{userId}")
+    @PUT("/api/user/{userId}")
     Call<MyPage> putPasswordModify(@Header("Authorization") String token, @Path("userId") String userId, @Body PasswordModify body);
 
-    @PUT("api/user/{userId}")
+    @PUT("/api/user/{userId}")
     Call<MyPage> putPhoneModify(@Header("Authorization") String token, @Path("userId") String userId, @Body PhoneModify body);
 
-    @POST("api/{userId}/device")
+    @POST("/api/{userId}/device")
     Call<MyPage> postCartion(@Header("Authorization") String token, @Path("userId") String userId, @Body Cartion body);
 
-    @PUT("api/{userId}/horn/{mobileSwitch}")
+    @PUT("/api/{userId}/horn/{mobileSwitch}")
     Call<MyPage> putMobileSw(@Header("Authorization") String token, @Path("userId") String userId, @Path("mobileSwitch") String mobileSwitch, @Body UserMobile body);
 
-    @PUT("api/{userId}/horn-index")
+    @PUT("/api/{userId}/horn-index")
     Call<MyPage> putMobileList(@Header("Authorization") String token, @Path("userId") String userId, @Body List<UserMobile> body);
 
-    @GET("api/banners")
+    @GET("/api/banners")
     Call<Banner> getBannerList(@Header("Authorization") String token);
 
-    @GET("api/use-apps")
+    @GET("/api/use-apps")
     Call<Learn> getLearnList(@Header("Authorization") String token);
 
-    @GET("api/notices")
+    @GET("/api/notices")
     Call<Notice> getNotice(@Header("Authorization") String token);
 
-    @GET("api/faqs")
+    @GET("/api/faqs")
     Call<Faq> getFaq(@Header("Authorization") String token);
 
-    @GET("api/app-manual")
+    @GET("/api/app-manual")
     Call<Manual> getManual(@Header("Authorization") String token);
 
-    @GET("api/user/{userId}/coupon")
+    @GET("/api/user/{userId}/coupon")
     Call<Coupon> getCoupon(@Header("Authorization") String token, @Path("userId") String userId);
 
-    @PUT("api/user/{userId}/coupon/{couponValue}")
+    @PUT("/api/user/{userId}/coupon/{couponValue}")
     Call<MyPage> putCoupon(@Header("Authorization") String token, @Path("userId") String userId, @Path("couponValue") String couponValue);
+
+    @DELETE("/api/{userId}/device/{deviceId}")
+    Call<MyPage> deleteCartion(@Header("Authorization") String token, @Path("userId") String userId, @Path("deviceId") String deviceId);
 }

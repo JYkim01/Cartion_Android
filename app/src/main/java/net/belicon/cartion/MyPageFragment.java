@@ -1,11 +1,14 @@
 package net.belicon.cartion;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -14,20 +17,28 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.clj.fastble.BleManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
+import net.belicon.cartion.adapters.CartionSettingAdapter;
+import net.belicon.cartion.adapters.ChangeAdapter;
 import net.belicon.cartion.models.Device;
 import net.belicon.cartion.models.MyPage;
 import net.belicon.cartion.models.PasswordModify;
 import net.belicon.cartion.models.PhoneModify;
 import net.belicon.cartion.models.User;
+import net.belicon.cartion.models.UserMobile;
 import net.belicon.cartion.retrofites.RetrofitInterface;
 import net.belicon.cartion.retrofites.RetrofitUtility;
 
@@ -37,6 +48,8 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public class MyPageFragment extends Fragment implements View.OnClickListener {
 
@@ -50,6 +63,7 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
     private InputMethodManager imm;
 
     private DeviceAdapter mAdapter;
+    private CartionSettingAdapter mSettingAdapter;
     private List<String> mDeviceList;
 
     private String token, email;
@@ -112,6 +126,7 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
 
         view.findViewById(R.id.my_page_container).setOnClickListener(this);
         view.findViewById(R.id.my_page_phone_modify_btn).setOnClickListener(this);
+        view.findViewById(R.id.my_page_cartion_settings_btn).setOnClickListener(this);
 
         imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
     }
@@ -165,6 +180,34 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
                                 }
                             });
                 }
+                break;
+            case R.id.my_page_cartion_settings_btn:
+                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
+                View view = inflater.inflate(R.layout.dialog_cartion_setting, null);
+                RecyclerView recyclerView = view.findViewById(R.id.cartion_setting_recylcer_view);
+
+                CartionSettingAdapter adapter = new CartionSettingAdapter(mRetInterface, mDeviceList, token, email);
+                recyclerView.setAdapter(adapter);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setView(view);
+                AlertDialog dialog = builder.create();
+                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                lp.copyFrom(dialog.getWindow().getAttributes());
+                lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+                lp.height = 1800;
+                dialog.show();
+                Window window = dialog.getWindow();
+                window.setAttributes(lp);
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                view.findViewById(R.id.cartion_setting_cancel_btn).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mAdapter.notifyDataSetChanged();
+                        dialog.dismiss();
+                    }
+                });
                 break;
         }
     }
@@ -220,7 +263,7 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
             if (mDeviceList.size() == 0) {
                 return 0;
             }
-            return 3;
+            return mDeviceList.size();
         }
 
         private class DeviceViewHolder extends RecyclerView.ViewHolder {

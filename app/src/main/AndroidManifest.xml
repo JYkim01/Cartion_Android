@@ -22,7 +22,7 @@
         android:roundIcon="@mipmap/ic_appicon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <activity android:name=".EulaActivity"></activity>
         <activity
             android:name=".CartionLearnActivity"
             android:screenOrientation="portrait" />

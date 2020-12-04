@@ -56,7 +56,7 @@ public class SignUpTwoActivity extends AppCompatActivity implements View.OnClick
 
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
-        onSingUp = new SignUpPresenter(this, this, mAuth, mRetInterface);
+        onSingUp = new SignUpPresenter(SignUpTwoActivity.this, this, mAuth, mRetInterface);
     }
 
     @Override

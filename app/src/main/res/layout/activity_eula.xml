@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".EulaActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:fontFamily="@font/scd5"
+            android:text="End User License Agreement"
+            android:textColor="@color/color_7F44A6"
+            android:textSize="14.23sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/color_D9D9D9" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!--                <TextView-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_marginStart="15dp"-->
+                <!--                    android:layout_marginTop="16dp"-->
+                <!--                    android:fontFamily="@font/scd5"-->
+                <!--                    android:text="수집하는 개인정보의 항목"-->
+                <!--                    android:textColor="@android:color/black"-->
+                <!--                    android:textSize="11.39sp"-->
+                <!--                    android:textStyle="bold" />-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginStart="15dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:fontFamily="@font/scd5"-->
+<!--                    android:text="제1조(목적)"-->
+<!--                    android:textColor="@android:color/black"-->
+<!--                    android:textSize="11.39sp"-->
+<!--                    android:textStyle="bold" />-->
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="15dp"
+                    android:fontFamily="@font/scd4"
+                    android:text="본 최종 사용자 라이선스 계약(“EULA”)은 BlackBerry Limited(“BlackBerry”)와 귀하(귀하, 회사 또는 권한을 위임 받은 대리인으로서의 기타 법인을 대신하여) 간에 체결합니다.\n\nEULA는 소프트웨어나 서비스에 다른 조항이 따르지 않는 한, BlackBerry 및/또는 BlackBerry 자회사가 독점 소유한 안드로이드 운영체제 소프트웨어에, 또는 BlackBerry나 BlackBerry 계열사가 해당 소프트웨어의 사용 허가자임을 구체적으로 적시할 경우, 그리고 그 일체의 업데이트 및/또는 보완 소프트웨어와(판매 시 이 소프트웨어를 장치와 함께 제공하거나 달리 다운로드(예: Google Play 스토어에서) 할 수 있을 경우) 장치에 설치된 애플리케이션(“소프트웨어”), 및 관련 서비스 일체를 사용할 수 있는 권리에 적용됩니다. 정확성을 기하기 위하여, 다음을 포함하되 그에 국한되지 않는, BlackBerry와 BlackBerry 자회사의 기업용 소프트웨어 및/또는 기업용 서비스 제안에는 BlackBerry 솔루션 라이선스 계약 및/또는 본 EULA가 아닌 기타 조항이 적용됩니다: BlackBerry Enterprise Service, Watchdox, SecuSmart, AtHoc, Good, Movirtu, 안드로이드 운영체제를 사용하는 장치를 위한 그 밖의 기업용 소프트웨어 및 기업용 서비스와 때때로 www.blackberry.com/enterprise 에서 확인할 수 있는 기업용 소프트웨어 및 기업용서비스 일체.\n\n소프트웨어 및/또는 서비스를 다운로드, 설치 및/또는 사용함으로써 귀하는 본 EULA 조항에 동의하게 됩니다. 본 EULA 조항을 준수할 경우, 귀하는 소프트웨어 및/또는 서비스를 사용할 권리를 갖게 됩니다.\n\n1. 성년 기준. 귀하는 반드시 십삼(13) 세 이상이어야 하며 성년 기준을 초과하였거나, 선고 성인이거나, 법적 부모 또는 보호자의 동의를 받았고 본 EULA를 체결할 전적인 능력과 자격을 갖추어야 합니다.\n\n2. 라이선스 범위. 본 EULA 조항 및 해당 소프트웨어나 서비스에 따르는 그 밖의 모든 조항에 따라, BlackBerry는 귀하에게 소프트웨어를 다운로드하고, 설치하고 사용하고, 귀사의 내부 또는 귀하의 개인 용도로 관련 서비스 일체를 사용할 개인적, 취소가능한, 비독점, 양도 불가 라이선스를 허여합니다. 본 EULA에 따라 본 소프트웨어의 라이선스를 허가하며 판매는 금지합니다\n\n3. 타사 소프트웨어. 소프트웨어 또는 서비스(또는 그 일부)를 획득하거나, 그에 접근하거나 사용하려면 귀하는 타사 소프트웨어나 서비스를 획득, 접근 및/또는 사용해야 할 수 있습니다. 귀하는 상기 타사 소프트웨어 획득, 접근 및 사용 허가를 받았으며 귀하가 동 타사 소프트웨어나 서비스를 획득하는 일체의 타사 디지털 스토어프론트에 준용되는 모든 사용 규칙을 준수함을 보장해야 합니다. 이 소프트웨어에는 타사가 아닌 BlackBerry가 본 EULA에 따라 귀하에게 라이선스를 허여하는 타사 프로그램도 포함될 수 있습니다. 타사 소프트웨어 또는 프로그램 관련 고지(있을 경우)는 귀하를 위한 정보 제공용으로만 포함됩니다.\n\n4. 수수료 및 가입. 소프트웨어 및/또는 서비스(또는 그 일부)에 수수료가 적용될 수 있으며 소프트웨어 및 서비스는 해당 라이선스 수수료를 지급한다는 조건에 따라 다운로드, 설치 및 사용할 수 있습니다. 가입 형식으로 또는 무료 평가판의 일부로 소프트웨어 및 서비스(또는 그 일부)를 획득하는 경우, 위에서 언급한 라이선스는 귀하가 필수 가입비를 결제한 기간이나 평가판 사용 기간에만 적용됩니다.\n\n5. 광고. 귀하가 구체적으로 타사 광고를 배제한 소프트웨어나 서비스에 가입한 경우가 아닌 한, 소프트웨어에는 타사 광고가 포함될 수 있습니다\n\n6. 사용 제한. 제2절(라이선스 범위)에서 허용된 바를 제외하고 귀하는 (i) 소프트웨어를 다운로드, 설치 또는 사용하거나 서비스를 사용하거나 (ii) 소프트웨어 또는 서비스 전체 또는 일부를 복사, 수정, 전송, 각색, 변형하거나 그 파생 저작물을 제작하거나 (iii) 소프트웨어 또는 서비스를 일체의 제3자에게 대여, 임대, 재사용 허가, 판매 또는 그 밖의 방식으로 양도하거나 (iv) 해적 행위 대응책을 비롯한 소프트웨어 또는 서비스의 기술 한도를 회피하여 사용하거나 (v) 소프트웨어 또는 서비스를 역설계하거나, 역파일하거나, 분해하거나, 디버깅하거나, 후킹하거나, 스푸핑하거나 해적 행위를 할 수 없습니다. 다만, 해당 한도에도 불구하고, BlackBerry가 관련법에 따라 이러한 행위를 금지하는 것을 허용하지 않는 경우는 예외로 합니다.\n\n7. 업데이트. BlackBerry는 언제든지 고지 유무에 관계 없이 소프트웨어나 서비스 가용성을 변경하거나 취소할 수 있습니다. 귀하는 소프트웨어 또는 서비스에 해를 끼치거나 타인의 소프트웨어 또는 서비스 사용을 방해할 수 있는 어떠한 방식으로도 소프트웨어 또는 서비스를 사용할 수 없습니다. 귀하는 어떤 식으로든 일체의 서비스, 데이터, 계정 또는 네트워크에 무단 접근을 시도하기 위하여 소프트웨어 또는 서비스를 사용할 수 없습니다.\n\n8. 지원. BlackBerry는 가입 기간 동안 가입형 소프트웨어와 서비스 고객에게 무료 웹형식 지원을 제공합니다.\n\n9. 해지. 귀하는 언제든지 자유롭게 소프트웨어 사용을 중단하고 귀하의 가입을 취소할 수 있습니다. BlackBerry에 통보할 필요는 없습니다. 다음 각 호의 시점에 본 EULA에 따른 라이선스가 자동 해지됩니다. (a) 무료 평가판 기간이 끝나고 당사가 기간을 갱신하거나 대안 제품으로 교체하지 않을 경우, (b) 귀하가 관련 수수료 결제를 중단하거나 본 EULA를 위반할 때, (c) BlackBerry가 소프트웨어 또는 서비스 일반 공개를 중단할 경우, 또는 (d) 당사가 귀하에게 라이선스 해지를 고지한 때. 해지 시, 본 라이선스에 따라 귀하에게 허여된 모든 권리가 중단되며 귀하는 귀하가 소유 및 관리하는 모든 제품에서 소프트웨어를 삭제하거나 제거하고 소프트웨어 및 일체의 서비스 사용을 중단해야 합니다\n\n10. 완전 합의. 본 EULA와, 그 보완, 업데이트 및 귀하가 사용하는 서비스에 관한 조항은 소프트웨어와 서비스에 대한 완전 합의를 구성합니다.\n\n11. 준거법. 본 EULA는 캐나다 온타리오 주법으로 규준하고 그에 따라 해석하며, 섭외사법에 준용되는 법체제는 배제합니다. 캐나다 온타리오 주, 토론토 법원이 비독점 관할권을 갖습니다. 귀하의 거주 국가 법원이 캐나다 온타리오 주법을 인정하지 않을 경우, 본 EULA는 귀하의 현지법에 따라 규준하고 해석해야 합니다.\n\n12. 법적 효력. 본 EULA에는 특정 법적 권리가 기술되어 있습니다. 귀하에게는 거주 국가의 법률에 따른 다른 권리가 있을 수 있습니다. 또한 귀하가 타사 소프트웨어를 획득한 출처인 당사자에 관한 권리가 있을 수도 있습니다. 귀하의 거주 국가 법률이 그에 따른 귀하의 권리 변경을 허가하지 않을 경우, 본 EULA는 동 법률에 따른 귀하의 권리를 변경하지 않습니다.\n\n13. 보증 책임 부인. 소프트웨어와 서비스는 “있는 그대로” BLACKBERRY가 제공하는 문서에 따라서만 접근하여 사용하도록 라이선스가 허여됩니다. 귀하는 사용에 따르는 위험을 감수해야 합니다. BLACKBERRY는 일체의 명시적 보증, 보장 또는 조건을 제공하지 않습니다. 귀하는 귀하의 거주 국가 법률에 따라, 본 EULA가 변경할 수 없는 추가적인 소비자 권리 또는 법적 보증을 보유할 수 있습니다. 귀하의 거주 국가 법률에서 허용하는 한도까지, BLACKBERRY는 암묵적인 상품성, 특정 합목적성 및 비침해 보증을 배제합니다\n\n14. 호주. 귀하는 호주 소비자법에 따른 법적 보증을 보유하며 본 조항의 어느 내용도 그러한 권리에 영향을 미칠 의도가 없습니다. 1 800 039 536번으로 BLACKBERRY 대리인에게 연락할 수 있습니다\n\n15. 한도 및 배제. 귀하는 귀하의 청구를 발생시킨 사건 발생 전 3개월 동안 귀하가 BLACKBERRY에 결제한 소프트웨어 또는 서비스 수수료 금액 한도까지만 BLACKBERRY로부터 직접적 손해를 보상 받을 수 있습니다. 귀하는 결과적 손해, 수익 소실, 특수, 간접적 또는 우발적 손해를 비롯한 그 밖의 모든 손해는 보상 받을 수 없습니다\n\n16. 한도 적용. 이 한도는 다음 각 호에 적용됩니다: (A) 소프트웨어 및 서비스 관련 모든 것, 및 (B) BlackBerry가 손해 가능성을 알고 있었거나 알았어야 했을 경우에도 적용됨. 상기 한도 또는 배제는 다음 각 호에는 적용되지 않습니다: (I) 귀하의 거주 국가가 BlackBerry가 그 책임을 배제하거나 제한하는 것을 허가하지 않는 한도까지 귀하에게 적용되지 않음. 이 경우 BlackBerry의 책임은 귀하의 거주 국가 법률에서 허용하는 한도까지 제한 및 배제됩니다. 또한 (II) 일체의 타사 컨텐츠(코드 포함), 타사 인터넷 사이트, 타사 소프트웨어, 데이터와 관련된 경우, BlackBerry의 책임은 완전히 배제됩니다.\n\n17. 개인정보 보호 정책 및 개인정보 처리 동의. BlackBerry 는 개인정보 보호 정책과 귀하의 개인정보 보안을 유지할 것을 약속합니다. 귀하가 BlackBerry 소프트웨어와 서비스를 사용함으로써 귀하의 개인정보를 처리하게 될 수 있습니다. 귀하의 개인정보 처리에는 귀하의 개인정보 수집, 사용, 처리, 전송, 저장 또는 공개가 포함됩니다. BlackBerry, BlackBerry 자회사 및 그 서비스 제공자가 처리하는 개인정보는 BlackBerry 개인정보 보호 정책에 따라 취급합니다(동 정책은 본 EULA 에 언급됨으로써 포함되며 www.blackberry.com/legal 에서 조회할 수 있습니다)."
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</RelativeLayout>

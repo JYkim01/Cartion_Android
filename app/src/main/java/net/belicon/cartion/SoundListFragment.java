@@ -43,7 +43,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
     private TabLayout mSoundListTabLayout;
     private RecyclerView mSoundListRecyclerView;
     private Spinner mCategorySpinner;
-    private TextView mMoreBtn;
+//    private TextView mMoreBtn;
 //    private MaterialSpinner mSoundListMaterialSpinner;
 
     private MusicListAdapter mAdapter;
@@ -53,7 +53,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
 
     private String token, email, categoryPos, categoryName, type;
     private int offset = 0;
-    private int limit = 10;
+    private int limit = 9999;
 
     public SoundListFragment() {
     }
@@ -71,7 +71,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
         mSoundListTabLayout = view.findViewById(R.id.sound_list_tab_layout);
         mSoundListRecyclerView = view.findViewById(R.id.sound_list_recycler_view);
         mCategorySpinner = view.findViewById(R.id.sound_list_search_spinner);
-        mMoreBtn = view.findViewById(R.id.sound_list_more_btn);
+//        mMoreBtn = view.findViewById(R.id.sound_list_more_btn);
 
         mRetInterface = RetrofitUtility.getRetrofitInterface();
 
@@ -81,7 +81,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
         }
 
         view.findViewById(R.id.sound_list_search_btn).setOnClickListener(this);
-        mMoreBtn.setOnClickListener(this);
+//        mMoreBtn.setOnClickListener(this);
 
         type = "horn";
         mSoundListTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -246,20 +246,19 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.sound_list_search_btn:
-                limit = 10;
                 mSoundListTabLayout.selectTab(mSoundListTabLayout.getTabAt(0));
                 onSoundResponse();
-                mMoreBtn.setVisibility(View.VISIBLE);
+//                mMoreBtn.setVisibility(View.VISIBLE);
                 break;
-            case R.id.sound_list_more_btn:
-                limit = 9999;
-                mMoreBtn.setVisibility(View.GONE);
-                if (mSoundListTabLayout.getSelectedTabPosition() == 0) {
-                    onSoundResponse();
-                } else {
-                    mSoundListTabLayout.selectTab(mSoundListTabLayout.getTabAt(0));
-                }
-                break;
+//            case R.id.sound_list_more_btn:
+//                limit = 9999;
+//                mMoreBtn.setVisibility(View.GONE);
+//                if (mSoundListTabLayout.getSelectedTabPosition() == 0) {
+//                    onSoundResponse();
+//                } else {
+//                    mSoundListTabLayout.selectTab(mSoundListTabLayout.getTabAt(0));
+//                }
+//                break;
         }
     }
 }

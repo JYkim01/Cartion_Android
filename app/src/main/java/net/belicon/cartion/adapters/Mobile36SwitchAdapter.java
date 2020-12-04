@@ -42,9 +42,9 @@ public class Mobile36SwitchAdapter extends RecyclerView.Adapter<Mobile36SwitchAd
     @Override
     public void onBindViewHolder(@NonNull Mobile36SwitchViewHolder holder, int position) {
         UserMobile data = mDataList.get(position + 2);
-        holder.mTypeText.setText(data.getCategoryName());
+        holder.mTypeText.setText("카션 " + data.getCategoryName());
         holder.mPosText.setText("경적" + (position + 3));
-        holder.mNameText.setText(data.getHornName());
+        holder.mNameText.setText(data.getHornName().replaceAll("_", "\n"));
     }
 
     @Override

@@ -71,6 +71,8 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
         holder.mMusicTitleText.setText(mMusicList.get(position).getHornName());
         if (position > 1) {
             holder.mMusicPositionText.setBackgroundResource(R.drawable.ic_sound_list_small_flag_1);
+        } else {
+            holder.mMusicPositionText.setBackgroundResource(R.drawable.ic_sound_list_small_flag);
         }
         holder.mMusicPreviewBtn.setOnClickListener(new View.OnClickListener() {
             @Override

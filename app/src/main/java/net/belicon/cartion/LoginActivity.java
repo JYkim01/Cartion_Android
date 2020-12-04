@@ -58,7 +58,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         SharedPreferences preferences = getSharedPreferences("login_key", Context.MODE_PRIVATE);
 
-        onLogin = new LoginPresenter(mAuth, mRetInterface, this, this, preferences);
+        onLogin = new LoginPresenter(mAuth, mRetInterface, LoginActivity.this, this, preferences);
 
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     }

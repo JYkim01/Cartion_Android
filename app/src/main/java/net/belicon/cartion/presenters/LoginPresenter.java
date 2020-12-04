@@ -45,6 +45,8 @@ public class LoginPresenter implements MainConstants.OnLogin {
         this.preferences = preferences;
     }
 
+    // 카션과 연결을 하지 않아도 다른 기능은 사용 할수 있다는 것을 명시
+
     @Override
     public void setOnLogin(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
@@ -85,14 +87,16 @@ public class LoginPresenter implements MainConstants.OnLogin {
                                         activity.finish();
                                     }
                                 }
+                            } else if (response.code() == 400) {
+                                Toast.makeText(context, "회원정보가 맞지 않습니다.", Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(context, "로그인을 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "로그인 실패", Toast.LENGTH_SHORT).show();
                             }
                         }
 
                         @Override
                         public void onFailure(Call<Login> call, Throwable t) {
-                            Toast.makeText(context, "로그인을 다시 시도해주세요.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "로그인 실패", Toast.LENGTH_SHORT).show();
                         }
                     });
         } else {

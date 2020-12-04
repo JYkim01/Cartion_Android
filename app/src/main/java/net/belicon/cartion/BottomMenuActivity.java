@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
 import android.content.Context;
 import android.content.Intent;
@@ -173,6 +174,12 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         int start = noti.indexOf(cn);
         int end = start + cn.length();
         SpannableString span = new SpannableString(noti);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            Typeface typeface = getResources().getFont(R.font.scd6);
+            span.setSpan(new TypefaceSpan(typeface), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else {
+            span.setSpan(new StyleSpan(BOLD), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
         span.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.color_7F44A6)), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         mSearchNotiText.setText(span);
 
@@ -237,6 +244,14 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
     protected void onResume() {
         super.onResume();
         mHomeDialog.setVisibility(View.GONE);
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, "블루투스가 지원되지 않습니다.", Toast.LENGTH_SHORT).show();
+        } else if (!mBluetoothAdapter.isEnabled()) {
+            Toast.makeText(this, "블루투스가 꺼져 있습니다.", Toast.LENGTH_SHORT).show();
+        } else {
+            Log.e("BLE", "ON");
+        }
 
         if (Realm.getDefaultInstance() != null) {
             realm = Realm.getDefaultInstance();
@@ -422,24 +437,26 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
             @Override
             public void onScanning(BleDevice bleDevice) {
-//                if (isUserCheck) {
-                    if (bleDevice.getName() != null && bleDevice.getName().equals("Cartion")) {
-//                    Log.e("CARTION", bleDevice.getName());
-//                        BleManager.getInstance().cancelScan();
-//                        connect(bleDevice);
-//                        Log.e("CartionMac", bleDevice.getMac());
-//                        mBleDevice = bleDevice;
-//                        mHomeDialog.setVisibility(View.GONE);
-//                    }
-//                } else {
-//                    if (bleDevice.getName() != null && bleDevice.getName().equals("Cartion") && bleDevice.getRssi() > -60) {
-//                    Log.e("CARTION", bleDevice.getName());
+                if (isUserCheck) {
+                    if (bleDevice.getName() != null && bleDevice.getMac().startsWith(mac)) {
+                        Log.e("CARTION", bleDevice.getName());
+                        BleManager.getInstance().cancelScan();
+                        connect(bleDevice);
+                        Log.e("CartionMac", bleDevice.getMac());
+                        mBleDevice = bleDevice;
+                        mHomeDialog.setVisibility(View.GONE);
+                        mac = bleDevice.getMac();
+                    }
+                } else {
+                    if (bleDevice.getName() != null && bleDevice.getName().equals("Cartion") && bleDevice.getRssi() > -60) {
+                        Log.e("CARTION", bleDevice.getName());
                         BleManager.getInstance().cancelScan();
                         connect(bleDevice);
                         mBleDevice = bleDevice;
                         mHomeDialog.setVisibility(View.GONE);
+                        mac = bleDevice.getMac();
                     }
-//                }
+                }
             }
 
             @Override
@@ -452,7 +469,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 if (mBleDevice == null) {
                     Toast.makeText(BottomMenuActivity.this, "검색되는 카션이 없습니다.", Toast.LENGTH_LONG).show();
                 } else {
-                    mac = mBleDevice.getMac();
                     Log.e("MAC", mac);
                 }
             }
@@ -554,21 +570,23 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                 if (s.equals("Success") || s.equals("Free Passage")) {
                                     mSearchContainer.setVisibility(View.GONE);
                                     mInfoContainer.setVisibility(View.VISIBLE);
-                                    mRetInterface.postCartion(token, email, new Cartion(serial, mac, "Cartion"))
-                                            .enqueue(new Callback<MyPage>() {
-                                                @Override
-                                                public void onResponse(Call<MyPage> call, Response<MyPage> response) {
-                                                    Log.e("CARTION SUCCESS", "" + response.code());
-                                                    if (response.code() == 200) {
-                                                        Toast.makeText(BottomMenuActivity.this, "카션이 등록되었습니다.", Toast.LENGTH_LONG).show();
+                                    if (!isUserCheck) {
+                                        mRetInterface.postCartion(token, email, new Cartion(serial, mac, "Cartion"))
+                                                .enqueue(new Callback<MyPage>() {
+                                                    @Override
+                                                    public void onResponse(Call<MyPage> call, Response<MyPage> response) {
+                                                        Log.e("CARTION SUCCESS", "" + response.code());
+                                                        if (response.code() == 200) {
+                                                            Toast.makeText(BottomMenuActivity.this, "카션이 등록되었습니다.", Toast.LENGTH_LONG).show();
+                                                        }
                                                     }
-                                                }
 
-                                                @Override
-                                                public void onFailure(Call<MyPage> call, Throwable t) {
+                                                    @Override
+                                                    public void onFailure(Call<MyPage> call, Throwable t) {
 
-                                                }
-                                            });
+                                                    }
+                                                });
+                                    }
                                 } else if (s.equals("Failure")) {
                                     Toast.makeText(BottomMenuActivity.this, "다른 사용자 ID의 카션입니다.", Toast.LENGTH_LONG).show();
                                     mSearchContainer.setVisibility(View.VISIBLE);
