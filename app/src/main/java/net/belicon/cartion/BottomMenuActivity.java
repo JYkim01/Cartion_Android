@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.animation.Animator;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
@@ -22,6 +23,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.AbsoluteSizeSpan;
@@ -571,6 +573,27 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     mSearchContainer.setVisibility(View.GONE);
                                     mInfoContainer.setVisibility(View.VISIBLE);
                                     if (!isUserCheck) {
+                                        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                                        View view = inflater.inflate(R.layout.dialog_down_notice, null);
+
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(BottomMenuActivity.this);
+                                        builder.setView(view);
+                                        AlertDialog dialog = builder.create();
+                                        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                                        lp.copyFrom(dialog.getWindow().getAttributes());
+                                        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+                                        lp.height = 1800;
+                                        dialog.show();
+                                        Window window = dialog.getWindow();
+                                        window.setAttributes(lp);
+                                        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                                        new Handler().postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                dialog.dismiss();
+                                            }
+                                        }, 3000);
                                         mRetInterface.postCartion(token, email, new Cartion(serial, mac, "Cartion"))
                                                 .enqueue(new Callback<MyPage>() {
                                                     @Override
@@ -665,7 +688,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
     private void onSwitch() {
         mSwitchMusic.clear();
         for (int i = 0; i < 10; i++) {
-            mSwitchMusic.add(new UserMobile(email, i + 1, i, "기본", "배려/안전", "horn", String.valueOf(i + 1)));
+            mSwitchMusic.add(new UserMobile(email, i + 1, i, "기본", "기본음", "horn", String.valueOf(i + 1)));
         }
 
         mRetInterface.getMobileSwitch(token, email)
@@ -699,7 +722,19 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     int mobileSwitch = list.get(i).getMobileSwitch();
                                     int seq = list.get(i).getSeq();
                                     String type = list.get(i).getType();
-                                    Log.e("SwP", mobileSwitch + "");
+//                                    Log.e("SwP", mobileSwitch + "");
+//                                    String wavPath = "";
+//                                    if (realm.where(UserMobile.class).equalTo("hornName", hornName).findFirst() != null) {
+//                                        if (realm.where(UserMobile.class).findAll().size() != 0) {
+//                                            wavPath = realm.where(UserMobile.class).equalTo("hornName", hornName).findFirst().getWavPath();
+//                                        }
+//                                    } else {
+//                                        List<String> stringList = Arrays.asList(getResources().getStringArray(R.array.normal));
+//                                        wavPath = stringList.get(i);
+//                                    }
+//                                    StringBuffer name = new StringBuffer(hornName);
+//                                    name.replace(hornName.lastIndexOf("_") + 1, hornName.length(), wavPath);
+//                                    Log.e("NAME", name.toString());
                                     mSwitchMusic.set(i, new UserMobile(email, mobileSwitch, i + 1, hornName, categoryName, hornType, hornId));
                                 }
 

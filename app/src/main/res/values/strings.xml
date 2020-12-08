@@ -2,4 +2,17 @@
     <string name="app_name">Cartion</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="normal">
+        <item>S_O_excuse_A</item>
+        <item>L_O_first</item>
+        <item>L_O_thanks_A</item>
+        <item>L_O_A</item>
+        <item>S_O_A</item>
+        <item>S_O_excuse</item>
+        <item>S_O_thanks</item>
+        <item>L_O_AA</item>
+        <item>L_O_first_A</item>
+        <item>S_O_first</item>
+    </string-array>
 </resources>

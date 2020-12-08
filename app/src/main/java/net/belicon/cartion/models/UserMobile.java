@@ -11,6 +11,7 @@ public class UserMobile extends RealmObject {
     private String categoryName;
     private String hornType;
     private String hornId;
+    private String wavPath;
 
     public UserMobile() {
     }
@@ -90,6 +91,14 @@ public class UserMobile extends RealmObject {
         this.hornId = hornId;
     }
 
+    public String getWavPath() {
+        return wavPath;
+    }
+
+    public void setWavPath(String wavPath) {
+        this.wavPath = wavPath;
+    }
+
     @Override
     public String toString() {
         return "UserMobile{" +
@@ -100,6 +109,7 @@ public class UserMobile extends RealmObject {
                 ", categoryName='" + categoryName + '\'' +
                 ", hornType='" + hornType + '\'' +
                 ", hornId='" + hornId + '\'' +
+                ", wavPath='" + wavPath + '\'' +
                 '}';
     }
 }

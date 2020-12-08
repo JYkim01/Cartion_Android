@@ -62,22 +62,27 @@ public class SplashActivity extends AppCompatActivity {
 
         Realm.init(this);
         RealmConfiguration config = new RealmConfiguration.Builder()
-                .schemaVersion(2)
+                .schemaVersion(3)
                 .migration(new RealmMigration() {
                     @Override
                     public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
                         RealmSchema schema = realm.getSchema();
+                        RealmObjectSchema mUserMobileSchema = schema.get("UserMobile");
                         if (newVersion == 1) {
-                            RealmObjectSchema mUserMobileSchema = schema.get("UserMobile");
                             if (mUserMobileSchema != null) {
                                 mUserMobileSchema.addField("categoryName", String.class, (FieldAttribute) null);
                             }
 
                             oldVersion++;
                         } else if (newVersion == 2) {
-                            RealmObjectSchema mUserMobileSchema = schema.get("UserMobile");
                             if (mUserMobileSchema != null) {
                                 mUserMobileSchema.addField("seq", int.class, (FieldAttribute) null);
+                            }
+
+                            oldVersion++;
+                        } else if (newVersion == 3) {
+                            if (mUserMobileSchema != null) {
+                                mUserMobileSchema.addField("wavPath", String.class, (FieldAttribute) null);
                             }
 
                             oldVersion++;

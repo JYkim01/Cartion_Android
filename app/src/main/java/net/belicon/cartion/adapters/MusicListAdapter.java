@@ -122,6 +122,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
                                                 data.setHornType(type);
                                                 data.setHornId(mMusicList.get(position).getHornId());
                                                 data.setCategoryName(categoryName);
+                                                data.setWavPath(mMusicList.get(position).getAdpcmPath());
                                             }
                                         });
                                         writeResponseBodyToDisk(holder.mMusicDownloadBtn.getContext(), response.body(), mMusicList.get(position).getHornName());

@@ -12,6 +12,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,7 +59,9 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
 
     private TextView mEmailText;
     private EditText mPhoneText;
+    private View mPhoneLine;
     private RecyclerView mDeviceRecyclerView;
+    private ImageButton mConfirmBtn;
 
     private InputMethodManager imm;
 
@@ -85,7 +88,9 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
         mEmailText = view.findViewById(R.id.my_page_email_text);
         mPhoneText = view.findViewById(R.id.my_page_phone_edit);
         mPhoneText.setEnabled(false);
+        mPhoneLine = view.findViewById(R.id.my_page_phone_line);
         mDeviceRecyclerView = view.findViewById(R.id.my_page_device_recycler_view);
+        mConfirmBtn = view.findViewById(R.id.my_page_settings_confirm_btn);
 
         token = "Bearer " + User.getUserToken();
         if (mAuth.getCurrentUser() != null) {
@@ -125,8 +130,9 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
                 });
 
         view.findViewById(R.id.my_page_container).setOnClickListener(this);
-        view.findViewById(R.id.my_page_phone_modify_btn).setOnClickListener(this);
+//        view.findViewById(R.id.my_page_phone_modify_btn).setOnClickListener(this);
         view.findViewById(R.id.my_page_cartion_settings_btn).setOnClickListener(this);
+        mConfirmBtn.setOnClickListener(this);
 
         imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
     }
@@ -160,54 +166,83 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
 //                            }
 //                        });
 //                break;
-            case R.id.my_page_phone_modify_btn:
+//            case R.id.my_page_phone_modify_btn:
+//                if (!mPhoneText.isEnabled()) {
+//                    mPhoneText.setEnabled(true);
+//                } else {
+//                    String phone = mPhoneText.getText().toString();
+//                    mRetInterface.putPhoneModify(token, email, new PhoneModify(phone))
+//                            .enqueue(new Callback<MyPage>() {
+//                                @Override
+//                                public void onResponse(Call<MyPage> call, Response<MyPage> response) {
+//                                    if (response.code() == 200) {
+//                                        mPhoneText.setEnabled(false);
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onFailure(Call<MyPage> call, Throwable t) {
+//
+//                                }
+//                            });
+//                }
+//                break;
+            case R.id.my_page_cartion_settings_btn:
                 if (!mPhoneText.isEnabled()) {
                     mPhoneText.setEnabled(true);
-                } else {
-                    String phone = mPhoneText.getText().toString();
-                    mRetInterface.putPhoneModify(token, email, new PhoneModify(phone))
-                            .enqueue(new Callback<MyPage>() {
-                                @Override
-                                public void onResponse(Call<MyPage> call, Response<MyPage> response) {
-                                    if (response.code() == 200) {
-                                        mPhoneText.setEnabled(false);
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<MyPage> call, Throwable t) {
-
-                                }
-                            });
                 }
-                break;
-            case R.id.my_page_cartion_settings_btn:
-                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
-                View view = inflater.inflate(R.layout.dialog_cartion_setting, null);
-                RecyclerView recyclerView = view.findViewById(R.id.cartion_setting_recylcer_view);
-
+                mPhoneLine.setVisibility(View.VISIBLE);
                 CartionSettingAdapter adapter = new CartionSettingAdapter(mRetInterface, mDeviceList, token, email);
-                recyclerView.setAdapter(adapter);
+                mDeviceRecyclerView.setAdapter(adapter);
+                mConfirmBtn.setVisibility(View.VISIBLE);
+//                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
+//                View view = inflater.inflate(R.layout.dialog_cartion_setting, null);
+//                RecyclerView recyclerView = view.findViewById(R.id.cartion_setting_recylcer_view);
+//
+//                CartionSettingAdapter adapter = new CartionSettingAdapter(mRetInterface, mDeviceList, token, email);
+//                recyclerView.setAdapter(adapter);
+//
+//                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//                builder.setView(view);
+//                AlertDialog dialog = builder.create();
+//                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+//                lp.copyFrom(dialog.getWindow().getAttributes());
+//                lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+//                lp.height = 1800;
+//                dialog.show();
+//                Window window = dialog.getWindow();
+//                window.setAttributes(lp);
+//                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//
+//                view.findViewById(R.id.cartion_setting_cancel_btn).setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        mAdapter.notifyDataSetChanged();
+//                        dialog.dismiss();
+//                    }
+//                });
+                break;
+            case R.id.my_page_settings_confirm_btn:
+                mPhoneLine.setVisibility(View.GONE);
+                String phone = mPhoneText.getText().toString();
+                mRetInterface.putPhoneModify(token, email, new PhoneModify(phone))
+                        .enqueue(new Callback<MyPage>() {
+                            @Override
+                            public void onResponse(Call<MyPage> call, Response<MyPage> response) {
+                                if (response.code() == 200) {
+                                    mPhoneText.setEnabled(false);
+                                }
+                            }
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setView(view);
-                AlertDialog dialog = builder.create();
-                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-                lp.copyFrom(dialog.getWindow().getAttributes());
-                lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
-                lp.height = 1800;
-                dialog.show();
-                Window window = dialog.getWindow();
-                window.setAttributes(lp);
-                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                            @Override
+                            public void onFailure(Call<MyPage> call, Throwable t) {
 
-                view.findViewById(R.id.cartion_setting_cancel_btn).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mAdapter.notifyDataSetChanged();
-                        dialog.dismiss();
-                    }
-                });
+                            }
+                        });
+//                mAdapter = new DeviceAdapter(mDeviceList);
+                mDeviceRecyclerView.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
+                mConfirmBtn.setVisibility(View.GONE);
                 break;
         }
     }

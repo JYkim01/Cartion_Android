@@ -26,13 +26,16 @@
                 android:src="@drawable/ic_common_logo" />
 
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/my_page_cartion_settings_btn"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:drawablePadding="4dp"
                 android:fontFamily="@font/scd6"
                 android:text="마이 페이지"
                 android:textColor="@color/color_7F44A6"
-                android:textSize="18.03sp" />
+                android:textSize="18.03sp"
+                app:drawableEndCompat="@drawable/ic_setting" />
 
         </LinearLayout>
 
@@ -48,6 +51,15 @@
             android:paddingTop="30dp"
             android:paddingEnd="20dp"
             android:paddingBottom="30dp">
+
+            <!--            <ImageButton-->
+            <!--                android:id="@+id/my_page_cartion_settings_btn"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_gravity="end"-->
+            <!--                android:layout_marginStart="4dp"-->
+            <!--                android:background="@null"-->
+            <!--                android:src="@drawable/ic_cartion_settings" />-->
 
             <TextView
                 android:layout_width="wrap_content"
@@ -65,7 +77,7 @@
                 android:background="@null"
                 android:fontFamily="@font/scd4"
                 android:hint="이메일주소"
-                android:textSize="9.49dp" />
+                android:textSize="11.39dp" />
 
             <!--            <TextView-->
             <!--                android:layout_width="51dp"-->
@@ -181,49 +193,35 @@
                         android:background="@null"
                         android:fontFamily="@font/scd4"
                         android:hint="인증번호 입력"
-                        android:textSize="9.49sp" />
+                        android:textSize="11.39dp" />
 
                     <View
+                        android:id="@+id/my_page_phone_line"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="4dp"
-                        android:background="@color/color_D9D9D9" />
+                        android:background="@color/color_D9D9D9"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/my_page_phone_modify_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:src="@drawable/ic_confirm_button" />
+                <!--                <androidx.appcompat.widget.AppCompatImageButton-->
+                <!--                    android:id="@+id/my_page_phone_modify_btn"-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:background="@null"-->
+                <!--                    android:src="@drawable/ic_confirm_button" />-->
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/scd6"
-                    android:text="카션"
-                    android:textColor="@color/color_7F44A6"
-                    android:textSize="11.39sp" />
-
-                <ImageButton
-                    android:id="@+id/my_page_cartion_settings_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:background="@null"
-                    android:src="@drawable/ic_cartion_settings" />
-
-            </LinearLayout>
+                android:layout_marginTop="35dp"
+                android:fontFamily="@font/scd6"
+                android:text="카션"
+                android:textColor="@color/color_7F44A6"
+                android:textSize="11.39sp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/my_page_device_recycler_view"
@@ -276,6 +274,16 @@
 
 
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/my_page_settings_confirm_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:background="@null"
+            android:src='@drawable/ic_confirm_button'
+            android:visibility="gone" />
 
     </LinearLayout>
 
