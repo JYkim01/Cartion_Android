@@ -22,8 +22,18 @@ import pyxis.uzuki.live.rollingbanner.RollingViewPagerAdapter;
 
 public class BannerPagerAdapter extends RollingViewPagerAdapter<String> {
 
+    private OnBannerClickListener listener;
+
     private Context context;
     private ArrayList<String> data;
+
+    public interface OnBannerClickListener {
+        void onItemClick(View view, int position);
+    }
+
+    public void setOnBannerClickListener(OnBannerClickListener listener) {
+        this.listener = listener;
+    }
 
     public BannerPagerAdapter(Context context, ArrayList<String> data) {
         super(context, data);
@@ -59,6 +69,13 @@ public class BannerPagerAdapter extends RollingViewPagerAdapter<String> {
         View view = LayoutInflater.from(context).inflate(R.layout.item_banner, null, false);
         ImageView image_container = (ImageView) view.findViewById(R.id.item_banner_image);
         Glide.with(context).load(data.get(pos)).into(image_container);
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onItemClick(v, pos);
+            }
+        });
 
         return view;
     }

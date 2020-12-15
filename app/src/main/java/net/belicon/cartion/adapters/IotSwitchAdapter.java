@@ -45,8 +45,12 @@ public class IotSwitchAdapter extends RecyclerView.Adapter<IotSwitchAdapter.IotS
     public void onBindViewHolder(@NonNull IotSwitchViewHolder holder, int position) {
         UserMobile data = mDataList.get(position);
         holder.mIotText.setText("IoT 스위치" + (position + 1));
-        holder.mTypeText.setText("카션 " + data.getCategoryName());
-        holder.mPosText.setText("경적" + (position + 1));
+        if (data.getCategoryName().equals("기본")) {
+            holder.mTypeText.setText("카션 " + data.getCategoryName() + "음");
+        } else {
+            holder.mTypeText.setText("카션 " + data.getCategoryName());
+        }
+        holder.mPosText.setText("음원" + (position + 1));
         holder.mNameText.setText(data.getHornName().replaceAll("_", "\n"));
     }
 

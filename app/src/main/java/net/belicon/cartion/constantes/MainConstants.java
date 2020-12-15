@@ -1,5 +1,6 @@
 package net.belicon.cartion.constantes;
 
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,6 @@ public interface MainConstants {
     }
 
     interface OnLogin {
-        void setOnLogin(String email, String password);
+        void setOnLogin(String email, String password, FrameLayout dialog);
     }
 }

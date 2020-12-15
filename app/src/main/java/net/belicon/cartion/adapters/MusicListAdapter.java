@@ -20,6 +20,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.clj.fastble.BleManager;
+
+import net.belicon.cartion.BottomMenuActivity;
 import net.belicon.cartion.R;
 import net.belicon.cartion.models.HornList;
 import net.belicon.cartion.models.UserMobile;
@@ -45,6 +48,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
     private List<HornList> mMusicList;
     private List<String> mDownList;
     private String mEmail, mAuth, type, categoryName;
+    private String music, music_name;
 
     private boolean isPlaying = false;
 
@@ -67,35 +71,66 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
     @SuppressLint("DefaultLocale")
     @Override
     public void onBindViewHolder(@NonNull MusicListViewHolder holder, int position) {
-        holder.mMusicPositionText.setText("경적" + (position + 1));
-        holder.mMusicTitleText.setText(mMusicList.get(position).getHornName());
-        if (position > 1) {
-            holder.mMusicPositionText.setBackgroundResource(R.drawable.ic_sound_list_small_flag_1);
+        holder.mMusicPositionText.setText("음원" + (position + 1));
+        if (mMusicList.get(position).getCategoryName().equals("기본")) {
+            holder.mMusicCategoryText.setText("카션 " + mMusicList.get(position).getCategoryName() + "음");
         } else {
-            holder.mMusicPositionText.setBackgroundResource(R.drawable.ic_sound_list_small_flag);
+            holder.mMusicCategoryText.setText("카션 " + mMusicList.get(position).getCategoryName());
         }
+        holder.mMusicTitleText.setText(mMusicList.get(position).getHornName());
+//        if (position > 1) {
+//            holder.mMusicPositionText.setBackgroundResource(R.drawable.ic_sound_list_small_flag_1);
+//        } else {
+//            holder.mMusicPositionText.setBackgroundResource(R.drawable.ic_sound_list_small_flag);
+//        }
+
+
+        if (isPlaying) {
+            if (music != null) {
+                if (music.equals(mMusicList.get(position).getHornId())) {
+                    holder.mMusicTitleText.setSelected(true);
+                    holder.mMusicTitleText.setTextColor(holder.mMusicTitleText.getContext().getResources().getColor(R.color.color_7F44A6));
+                } else {
+                    holder.mMusicTitleText.setSelected(true);
+                    holder.mMusicTitleText.setTextColor(Color.WHITE);
+                }
+            } else {
+                holder.mMusicTitleText.setSelected(true);
+                holder.mMusicTitleText.setTextColor(Color.WHITE);
+            }
+        } else {
+            holder.mMusicTitleText.setSelected(true);
+            holder.mMusicTitleText.setTextColor(Color.WHITE);
+        }
+
         holder.mMusicPreviewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                retrofit.getPCM(mAuth, mMusicList.get(position).getHornId())
-                        .enqueue(new Callback<ResponseBody>() {
-                            @Override
-                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                Log.e("PCM CODE", "" + response.code());
-                                if (response.code() == 200) {
-                                    try {
-                                        playWav(holder.mMusicPreviewBtn.getContext(), holder.mMusicTitleText, response.body().bytes(), mMusicList.get(position).getHornName());
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
+                if (!isPlaying) {
+                    music = mMusicList.get(position).getHornId();
+                    music_name = mMusicList.get(position).getHornName();
+                    retrofit.getPCM(mAuth, music)
+                            .enqueue(new Callback<ResponseBody>() {
+                                @Override
+                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                    Log.e("PCM CODE", "" + response.code());
+                                    if (response.code() == 200) {
+                                        try {
+                                            playWav(holder.mMusicPreviewBtn.getContext(), holder.mMusicTitleText, response.body().bytes(), music_name);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }
-                            }
 
-                            @Override
-                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                @Override
+                                public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                            }
-                        });
+                                }
+                            });
+                } else {
+                    Toast.makeText(holder.mMusicPreviewBtn.getContext(), "다른 음원이 재생 중 입니다.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -111,6 +146,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
                                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                     Log.e("DOWN RESPONSE", "" + response.code());
                                     if (response.code() == 200) {
+                                        mDownList.add(mMusicList.get(position).getHornName() + ".wav");
                                         Realm realm = Realm.getDefaultInstance();
                                         realm.executeTransaction(new Realm.Transaction() {
                                             @Override
@@ -147,6 +183,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
     static class MusicListViewHolder extends RecyclerView.ViewHolder {
 
         private TextView mMusicPositionText;
+        private TextView mMusicCategoryText;
         private TextView mMusicTitleText;
         private ImageButton mMusicPreviewBtn;
         private ImageButton mMusicDownloadBtn;
@@ -155,6 +192,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
             super(itemView);
 
             mMusicPositionText = itemView.findViewById(R.id.item_sound_position_text);
+            mMusicCategoryText = itemView.findViewById(R.id.item_sound_category_text);
             mMusicTitleText = itemView.findViewById(R.id.item_sound_title_text);
             mMusicPreviewBtn = itemView.findViewById(R.id.item_sound_preview_btn);
             mMusicDownloadBtn = itemView.findViewById(R.id.item_sound_download_btn);
@@ -181,9 +219,15 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     if (!isPlaying) {
-                        nameTextView.setTextColor(nameTextView.getContext().getResources().getColor(R.color.color_7F44A6));
-                        mediaPlayer.start();
-                        isPlaying = true;
+                        if (nameTextView.getText().toString().equals(name)) {
+                            nameTextView.setTextColor(nameTextView.getContext().getResources().getColor(R.color.color_7F44A6));
+                            mediaPlayer.start();
+                            isPlaying = true;
+                        } else {
+                            nameTextView.setTextColor(Color.WHITE);
+                        }
+                    } else {
+                        nameTextView.setTextColor(Color.WHITE);
                     }
                 }
             });
@@ -245,7 +289,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
                 if (outputStream != null) {
                     outputStream.close();
                 }
-                Toast.makeText(context, "다운로드 완료.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "앱에 저장 완료.", Toast.LENGTH_SHORT).show();
             }
         } catch (IOException e) {
             return false;

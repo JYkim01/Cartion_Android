@@ -14,6 +14,9 @@ public class HornList implements Serializable {
     @SerializedName("hornName")
     @Expose
     private String hornName;
+    @SerializedName("categoryName")
+    @Expose
+    private String categoryName;
     @SerializedName("wavPath")
     @Expose
     private String wavPath;
@@ -25,9 +28,10 @@ public class HornList implements Serializable {
     private Object multipartFiles;
     private final static long serialVersionUID = -8832792040383059628L;
 
-    public HornList(String hornId, String hornName, String wavPath, String adpcmPath) {
+    public HornList(String hornId, String hornName, String categoryName, String wavPath, String adpcmPath) {
         this.hornId = hornId;
         this.hornName = hornName;
+        this.categoryName = categoryName;
         this.wavPath = wavPath;
         this.adpcmPath = adpcmPath;
     }
@@ -46,6 +50,14 @@ public class HornList implements Serializable {
 
     public void setHornName(String hornName) {
         this.hornName = hornName;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     public String getWavPath() {
@@ -77,6 +89,7 @@ public class HornList implements Serializable {
         return "HornList{" +
                 "hornId='" + hornId + '\'' +
                 ", hornName='" + hornName + '\'' +
+                ", categoryName='" + categoryName + '\'' +
                 ", wavPath='" + wavPath + '\'' +
                 ", adpcmPath='" + adpcmPath + '\'' +
                 '}';

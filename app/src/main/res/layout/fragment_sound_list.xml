@@ -29,7 +29,7 @@
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="전체 경적" />
+                android:text="전체 음원" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
@@ -96,7 +96,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp"
                     android:fontFamily="@font/scd5"
-                    android:text="다운로드"
+                    android:text="앱에 저장"
                     android:textColor="@color/color_7F44A6"
                     android:textSize="8.54sp" />
 

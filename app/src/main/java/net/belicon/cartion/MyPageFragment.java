@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,8 +59,8 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
     private RetrofitInterface mRetInterface;
 
     private TextView mEmailText;
-    private EditText mPhoneText;
-    private View mPhoneLine;
+    private EditText mMallEmailText, mPhoneText;
+    private View mMallEmailLine, mPhoneLine;
     private RecyclerView mDeviceRecyclerView;
     private ImageButton mConfirmBtn;
 
@@ -69,7 +70,7 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
     private CartionSettingAdapter mSettingAdapter;
     private List<String> mDeviceList;
 
-    private String token, email;
+    private String token, email, mac;
 
     public MyPageFragment() {
     }
@@ -86,8 +87,12 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
 
         mEmailText = view.findViewById(R.id.my_page_email_text);
+        mMallEmailText = view.findViewById(R.id.my_page_mall_email_edit);
+        mMallEmailText.setEnabled(false);
+        mMallEmailLine = view.findViewById(R.id.my_page_mall_email_line);
         mPhoneText = view.findViewById(R.id.my_page_phone_edit);
         mPhoneText.setEnabled(false);
+        mPhoneText.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
         mPhoneLine = view.findViewById(R.id.my_page_phone_line);
         mDeviceRecyclerView = view.findViewById(R.id.my_page_device_recycler_view);
         mConfirmBtn = view.findViewById(R.id.my_page_settings_confirm_btn);
@@ -114,7 +119,6 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
 
                                 for (int i = 0; i < response.body().getData().getDevices().size(); i++) {
                                     String id = response.body().getData().getDevices().get(i).getDeviceId();
-
                                     mDeviceList.add(id);
                                 }
                                 mAdapter = new DeviceAdapter(mDeviceList);
@@ -188,11 +192,20 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
 //                }
 //                break;
             case R.id.my_page_cartion_settings_btn:
+                if (BleManager.getInstance().isConnected(BottomMenuActivity.mBleDevice)) {
+                    if (getActivity() != null) {
+                        ((BottomMenuActivity) getActivity()).onEventListen();
+                    }
+                }
+                if (!mMallEmailText.isEnabled()) {
+                    mMallEmailText.setEnabled(true);
+                }
                 if (!mPhoneText.isEnabled()) {
                     mPhoneText.setEnabled(true);
                 }
+                mMallEmailLine.setVisibility(View.VISIBLE);
                 mPhoneLine.setVisibility(View.VISIBLE);
-                CartionSettingAdapter adapter = new CartionSettingAdapter(mRetInterface, mDeviceList, token, email);
+                CartionSettingAdapter adapter = new CartionSettingAdapter(((BottomMenuActivity) getActivity()), mRetInterface, BottomMenuActivity.mBleDevice, mDeviceList, token, email);
                 mDeviceRecyclerView.setAdapter(adapter);
                 mConfirmBtn.setVisibility(View.VISIBLE);
 //                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);

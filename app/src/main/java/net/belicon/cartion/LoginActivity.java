@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -37,6 +38,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private MainConstants.OnLogin onLogin;
 
     private EditText mEmailEdit, mPasswordEdit;
+    private FrameLayout mDialog;
 
     private InputMethodManager imm;
 
@@ -48,6 +50,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         mEmailEdit = findViewById(R.id.login_email_edit);
         mPasswordEdit = findViewById(R.id.login_password_edit);
+        mDialog = findViewById(R.id.login_dialog);
 
         findViewById(R.id.login_container).setOnClickListener(this);
         findViewById(R.id.login_btn).setOnClickListener(this);
@@ -69,12 +72,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         imm.hideSoftInputFromWindow(mPasswordEdit.getWindowToken(), 0);
         switch (v.getId()) {
             case R.id.login_btn:
+                mDialog.setVisibility(View.VISIBLE);
                 String email = mEmailEdit.getText().toString();
                 String password = mPasswordEdit.getText().toString();
                 if (email.isEmpty() || password.isEmpty()) {
+                    mDialog.setVisibility(View.GONE);
                     Toast.makeText(this, "이메일과 패스워드를 입력해주세요.", Toast.LENGTH_SHORT).show();
                 } else {
-                    onLogin.setOnLogin(email, password);
+                    onLogin.setOnLogin(email, password, mDialog);
                 }
                 break;
             case R.id.login_forgot_password_btn:

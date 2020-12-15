@@ -21,6 +21,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,9 +33,12 @@ import android.text.style.StyleSpan;
 import android.text.style.TypefaceSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -134,7 +138,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
     private List<UserMobile> mSwitchMusic;
     private List<UserMobile> mDownMusic;
 
-    private BleDevice mBleDevice;
+    public static BleDevice mBleDevice;
     private String token, email, mac, serial;
     private byte[] convertByte;
     private boolean isUserCheck = false;
@@ -147,6 +151,8 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         onCheckPermission();
         setContentView(R.layout.activity_bottom_menu);
+
+        findViewById(R.id.bottom_menu_container).setOnClickListener(this);
 
         mBannerPager = findViewById(R.id.bottom_main_banner);
         mHomeBtn = findViewById(R.id.bottom_home_btn);
@@ -197,7 +203,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         BleManager.getInstance().init(getApplication());
         BleManager.getInstance()
                 .enableLog(true)
-                .setReConnectCount(3, 5000)
+                .setReConnectCount(3, 3000)
                 .setSplitWriteNum(17)
                 .setConnectOverTime(20000)
                 .setOperateTimeout(5000);
@@ -228,6 +234,13 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                 }
                                 BannerPagerAdapter scrollAdapter = new BannerPagerAdapter(BottomMenuActivity.this, data);
                                 mBannerPager.setAdapter(scrollAdapter); //Auto Viewpager에 Adapter 장착
+
+                                scrollAdapter.setOnBannerClickListener(new BannerPagerAdapter.OnBannerClickListener() {
+                                    @Override
+                                    public void onItemClick(View view, int position) {
+                                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(response.body().getData().getBannerList().get(position).getLinkUrl())));
+                                    }
+                                });
                             }
                         }
                     }
@@ -357,7 +370,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         });
     }
 
-    private void onServerDevice() {
+    public void onServerDevice() {
         if (mAuth.getCurrentUser() != null) {
             mRetInterface.getUserData(token, mAuth.getCurrentUser().getEmail())
                     .enqueue(new Callback<MyPage>() {
@@ -424,7 +437,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
     }
 
 
-    private void startScan() {
+    public void startScan() {
         BleManager.getInstance().scan(new BleScanCallback() {
             @Override
             public void onScanStarted(boolean success) {
@@ -477,7 +490,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         });
     }
 
-    private void connect(final BleDevice bleDevice) {
+    public void connect(final BleDevice bleDevice) {
         BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
             @Override
             public void onStartConnect() {
@@ -491,6 +504,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+                mBleDevice = bleDevice;
                 String SERVICE_UUID = gatt.getServices().get(2).getUuid().toString();
                 String CHARACTERISTIC_UUID = gatt.getServices().get(2).getCharacteristics().get(1).getUuid().toString();
                 Log.e("SERVICE UUID", SERVICE_UUID);
@@ -573,34 +587,15 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     mSearchContainer.setVisibility(View.GONE);
                                     mInfoContainer.setVisibility(View.VISIBLE);
                                     if (!isUserCheck) {
-                                        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-                                        View view = inflater.inflate(R.layout.dialog_down_notice, null);
-
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(BottomMenuActivity.this);
-                                        builder.setView(view);
-                                        AlertDialog dialog = builder.create();
-                                        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-                                        lp.copyFrom(dialog.getWindow().getAttributes());
-                                        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
-                                        lp.height = 1800;
-                                        dialog.show();
-                                        Window window = dialog.getWindow();
-                                        window.setAttributes(lp);
-                                        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-                                        new Handler().postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                dialog.dismiss();
-                                            }
-                                        }, 3000);
-                                        mRetInterface.postCartion(token, email, new Cartion(serial, mac, "Cartion"))
+                                        mRetInterface.postCartion(token, email, new Cartion(serial, mac.substring(0, 11), "Cartion"))
                                                 .enqueue(new Callback<MyPage>() {
                                                     @Override
                                                     public void onResponse(Call<MyPage> call, Response<MyPage> response) {
                                                         Log.e("CARTION SUCCESS", "" + response.code());
-                                                        if (response.code() == 200) {
+                                                        if (response.code() == 200 || response.code() == 201) {
                                                             Toast.makeText(BottomMenuActivity.this, "카션이 등록되었습니다.", Toast.LENGTH_LONG).show();
+                                                        } else {
+                                                            Toast.makeText(BottomMenuActivity.this, "카션 등록이 실패하였습니다.", Toast.LENGTH_SHORT).show();
                                                         }
                                                     }
 
@@ -616,7 +611,19 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     mInfoContainer.setVisibility(View.GONE);
                                 }
                                 if (s.contains("Battery Level")) {
-                                    mBatteryText.setText(s.replace("Battery Level:", ""));
+                                    String battery = s.replace("Battery Level:", "");
+                                    Animation anim = new AlphaAnimation(0.0f, 1.0f);
+                                    anim.setDuration(1000);
+                                    anim.setStartOffset(20);
+                                    anim.setRepeatMode(Animation.REVERSE);
+                                    anim.setRepeatCount(Animation.INFINITE);
+                                    mBatteryText.setText(battery);
+//                                    Log.e("TESTSESTS", Integer.parseInt(battery.replace("%", "")) + "");
+                                    if (Integer.parseInt(battery.replace("%", "")) <= 25) {
+                                        mBatteryText.setTextColor(Color.RED);
+                                        mBatteryText.startAnimation(anim);
+                                        Toast.makeText(BottomMenuActivity.this, "충전이 필요합니다.", Toast.LENGTH_LONG).show();
+                                    }
                                 } else if (s.contains("Temperature") && !s.contains("Max Temperature")) {
                                     mTemperatureText.setText(s.replace("Temperature:", "") + "°C");
                                 }
@@ -627,7 +634,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 });
     }
 
-    private void writeData(BleDevice bleDevice, String uuid_service, String uuid_characteristic_write, byte[] data) {
+    public void writeData(BleDevice bleDevice, String uuid_service, String uuid_characteristic_write, byte[] data) {
         BleManager.getInstance().write(
                 bleDevice,
                 uuid_service,
@@ -766,7 +773,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         View view = inflater.inflate(R.layout.dialog_change, null);
         RecyclerView recyclerView = view.findViewById(R.id.change_list_recycler_view);
 
-        ChangeAdapter adapter = new ChangeAdapter(mSwitchMusic);
+        ChangeAdapter adapter = new ChangeAdapter(BottomMenuActivity.this, mSwitchMusic);
         //item drag&drop, swipe 설정
         ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
         ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
@@ -874,7 +881,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
             }
             musicList.add(new Down(tempFile.getName(), tempFile, hornId));
         }
-        DownloadAdapter adapter = new DownloadAdapter(musicList, token, mRetInterface);
+        DownloadAdapter adapter = new DownloadAdapter(BottomMenuActivity.this, musicList, token, mRetInterface);
         recyclerView.setAdapter(adapter);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(view);
@@ -1027,10 +1034,27 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
     private Fragment fragmentContainer;
 
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        int action = event.getAction();
+//        switch (action) {
+//            case MotionEvent.ACTION_DOWN:
+//                Log.e("CLICKED", "MainMainMainMainMainMainMainMainMainMainMain");
+//                break;
+//            case MotionEvent.ACTION_UP:
+//                break;
+//        }
+//        return super.onTouchEvent(event);
+//    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.bottom_menu_container:
+
+                break;
             case R.id.bottom_home_btn:
+                onEventListen();
 //                getSupportFragmentManager().beginTransaction().add(R.id.bottom_menu_container, new HomeFragment()).addToBackStack(null).commit();
                 if (fragmentContainer != null) {
                     mHomeDialog.setVisibility(View.GONE);
@@ -1045,10 +1069,12 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 }
                 break;
             case R.id.bottom_music_btn:
+                onEventListen();
                 fragmentContainer = new SoundListFragment();
                 getSupportFragmentManager().beginTransaction().add(R.id.bottom_menu_container, new SoundListFragment()).addToBackStack(null).commit();
                 break;
             case R.id.bottom_my_page_btn:
+                onEventListen();
                 fragmentContainer = new MyPageFragment();
                 getSupportFragmentManager().beginTransaction().add(R.id.bottom_menu_container, new MyPageFragment()).addToBackStack(null).commit();
                 break;
@@ -1192,6 +1218,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
                             onLost()
                     );
+                    Toast.makeText(BottomMenuActivity.this, "기존 스위치가 제거 되었습니다. 새로운 스위치를 등록해 주세요.", Toast.LENGTH_SHORT).show();
                 }
                 dialog.dismiss();
             }
@@ -1227,6 +1254,17 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
+    public void onEventListen() {
+        if (BleManager.getInstance().isConnected(mBleDevice)) {
+            Log.e("COMMEND", "버전 확인");
+            writeData(mBleDevice,
+                    "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+                    "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+                    onListen("CTE:0")
+            );
+        }
+    }
+
     private byte[] onVersion(String version) {
         int checksum = 0;
 
@@ -1237,6 +1275,20 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
             checksum += bytes[i];
         }
         dataBytes[version.length()] = (byte) (checksum % 256);
+        checksum = 0;
+        return dataBytes;
+    }
+
+    private byte[] onListen(String event) {
+        int checksum = 0;
+
+        byte[] bytes = event.getBytes();
+        byte[] dataBytes = new byte[event.length() + 1];
+        for (int i = 0; i < bytes.length; i++) {
+            dataBytes[i] = bytes[i];
+            checksum += bytes[i];
+        }
+        dataBytes[event.length()] = (byte) (checksum % 256);
         checksum = 0;
         return dataBytes;
     }
@@ -1282,7 +1334,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onBackPressed() {
-        if (mProgressDialog != null) {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         } else {
             if (pressedTime == 0) {

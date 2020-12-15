@@ -14,6 +14,7 @@ import androidx.recyclerview.selection.ItemDetailsLookup;
 import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.belicon.cartion.BottomMenuActivity;
 import net.belicon.cartion.ItemMoveCallback;
 import net.belicon.cartion.R;
 import net.belicon.cartion.models.Down;
@@ -25,6 +26,7 @@ import java.util.List;
 
 public class ChangeAdapter extends RecyclerView.Adapter<ChangeAdapter.ChangeViewHolder> implements ItemMoveCallback.ItemTouchHelperAdapter {
 
+    private BottomMenuActivity mActivity;
     private List<UserMobile> mMusicList;
 
     private OnChangeClickListener mListener = null;
@@ -37,7 +39,8 @@ public class ChangeAdapter extends RecyclerView.Adapter<ChangeAdapter.ChangeView
         this.mListener = listener;
     }
 
-    public ChangeAdapter(List<UserMobile> mMusicList) {
+    public ChangeAdapter(BottomMenuActivity activity, List<UserMobile> mMusicList) {
+        this.mActivity = activity;
         this.mMusicList = mMusicList;
     }
 
@@ -71,6 +74,7 @@ public class ChangeAdapter extends RecyclerView.Adapter<ChangeAdapter.ChangeView
             }
         }
 
+        mActivity.onEventListen();
         notifyItemMoved(fromPos, targetPos);
     }
 

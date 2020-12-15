@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
@@ -53,7 +54,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
 
     private String token, email, categoryPos, categoryName, type;
     private int offset = 0;
-    private int limit = 9999;
+    private int limit = 20;
 
     public SoundListFragment() {
     }
@@ -151,7 +152,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                             if (response.body() != null) {
                                 List<HornList> item = response.body().getData().getHornList();
                                 for (int i = 0; i < item.size(); i++) {
-                                    mMusicList.add(new HornList(item.get(i).getHornId(), item.get(i).getHornName(), item.get(i).getWavPath(), item.get(i).getAdpcmPath()));
+                                    mMusicList.add(new HornList(item.get(i).getHornId(), item.get(i).getHornName(), item.get(i).getCategoryName(), item.get(i).getWavPath(), item.get(i).getAdpcmPath()));
                                 }
                                 mAdapter = new MusicListAdapter(mRetInterface, mMusicList, mDownList, email, token, type, categoryName);
                                 mSoundListRecyclerView.setAdapter(mAdapter);
@@ -181,6 +182,21 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
 
             }
         });
+
+        mSoundListRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                int lastVisibleItemPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
+                int itemTotalCount = recyclerView.getAdapter().getItemCount() - 1;
+                if (lastVisibleItemPosition == itemTotalCount) {
+                    Log.d("RECYCLER VIEW", "last Position...");
+                    limit = limit + 10;
+                    onSoundResponse();
+                }
+            }
+        });
     }
 
     @Override
@@ -203,7 +219,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                             if (response.body() != null) {
                                 List<HornList> item = response.body().getData().getHornList();
                                 for (int i = 0; i < item.size(); i++) {
-                                    mMusicList.add(new HornList(item.get(i).getHornId(), item.get(i).getHornName(), item.get(i).getWavPath(), item.get(i).getAdpcmPath()));
+                                    mMusicList.add(new HornList(item.get(i).getHornId(), item.get(i).getHornName(), item.get(i).getCategoryName(), item.get(i).getWavPath(), item.get(i).getAdpcmPath()));
                                 }
                                 mAdapter.notifyDataSetChanged();
                             }
@@ -228,7 +244,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                             if (response.body() != null) {
                                 List<HornList> item = response.body().getData().getHornList();
                                 for (int i = 0; i < item.size(); i++) {
-                                    mMusicList.add(new HornList(item.get(i).getHornId(), item.get(i).getHornName(), item.get(i).getWavPath(), item.get(i).getAdpcmPath()));
+                                    mMusicList.add(new HornList(item.get(i).getHornId(), item.get(i).getHornName(), item.get(i).getCategoryName(), item.get(i).getWavPath(), item.get(i).getAdpcmPath()));
                                 }
                                 mAdapter.notifyDataSetChanged();
                             }

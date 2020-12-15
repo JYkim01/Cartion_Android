@@ -42,8 +42,12 @@ public class Mobile710SwitchAdapter extends RecyclerView.Adapter<Mobile710Switch
     @Override
     public void onBindViewHolder(@NonNull Mobile710ViewHolder holder, int position) {
         UserMobile data = mDataList.get(position + 6);
-        holder.mTypeText.setText("카션 " + data.getCategoryName());
-        holder.mPosText.setText("경적" + (position + 7));
+        if (data.getCategoryName().equals("기본")) {
+            holder.mTypeText.setText("카션 " + data.getCategoryName() + "음");
+        } else {
+            holder.mTypeText.setText("카션 " + data.getCategoryName());
+        }
+        holder.mPosText.setText("음원" + (position + 7));
         holder.mNameText.setText(data.getHornName().replaceAll("_", "\n"));
     }
 

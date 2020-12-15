@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -48,13 +50,13 @@ public class LoginPresenter implements MainConstants.OnLogin {
     // 카션과 연결을 하지 않아도 다른 기능은 사용 할수 있다는 것을 명시
 
     @Override
-    public void setOnLogin(String email, String password) {
+    public void setOnLogin(String email, String password, FrameLayout dialog) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            onVerify(email, password);
+                            onVerify(email, password, dialog);
                         } else {
                             Log.e("AUTH ERROR", task.getException().getLocalizedMessage() + "");
                         }
@@ -62,7 +64,7 @@ public class LoginPresenter implements MainConstants.OnLogin {
                 });
     }
 
-    private void onVerify(String email, String password) {
+    private void onVerify(String email, String password, FrameLayout dialog) {
         if (mAuth.getCurrentUser().isEmailVerified()) {
             editor = preferences.edit();
             retrofit.postLogin(new User(email, password))
@@ -79,6 +81,7 @@ public class LoginPresenter implements MainConstants.OnLogin {
                                         editor.apply();
                                         User.setUserToken(token);
                                         String eulaYn = response.body().getData().getEulaYn();
+                                        dialog.setVisibility(View.GONE);
                                         if (eulaYn.equals("Y")) {
                                             context.startActivity(new Intent(context, BottomMenuActivity.class));
                                         } else {
@@ -88,14 +91,17 @@ public class LoginPresenter implements MainConstants.OnLogin {
                                     }
                                 }
                             } else if (response.code() == 400) {
+                                dialog.setVisibility(View.GONE);
                                 Toast.makeText(context, "회원정보가 맞지 않습니다.", Toast.LENGTH_SHORT).show();
                             } else {
+                                dialog.setVisibility(View.GONE);
                                 Toast.makeText(context, "로그인 실패", Toast.LENGTH_SHORT).show();
                             }
                         }
 
                         @Override
                         public void onFailure(Call<Login> call, Throwable t) {
+                            dialog.setVisibility(View.GONE);
                             Toast.makeText(context, "로그인 실패", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -105,6 +111,7 @@ public class LoginPresenter implements MainConstants.OnLogin {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
+                                dialog.setVisibility(View.GONE);
                                 Toast.makeText(context, "이메일을 확인해주세요.", Toast.LENGTH_SHORT).show();
                             }
                         }

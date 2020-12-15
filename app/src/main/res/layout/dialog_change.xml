@@ -20,7 +20,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:src="@drawable/ic_speech_bubble_box_font" />
+            android:src="@drawable/ic_switch_change_title" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/change_list_recycler_view"

@@ -66,16 +66,16 @@ public class SignUpPresenter implements MainConstants.OnSingUp {
 
     @Override
     public void setOnJoin(TextView message1, TextView message2, String email, String password, String phone, String confirmPassword) {
-        if (password.length() < 6) {
-            message1.setVisibility(View.VISIBLE);
+        if (message1.getVisibility() == View.VISIBLE) {
+            Toast.makeText(context, "비밀번호는 6자리 이상 입력해 주세요.", Toast.LENGTH_SHORT).show();
         } else if (password.equals(confirmPassword)) {
             if (isChecked) {
                 onCreateUser(email, password, phone);
             } else {
                 Toast.makeText(context, "아이디 중복체크를 해주세요.", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            message2.setVisibility(View.VISIBLE);
+        } else if (message2.getVisibility() == View.VISIBLE){
+            Toast.makeText(context, "비밀번호와 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
         }
     }
 

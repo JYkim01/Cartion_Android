@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.belicon.cartion.BottomMenuActivity;
 import net.belicon.cartion.R;
 import net.belicon.cartion.models.Down;
 import net.belicon.cartion.retrofites.RetrofitInterface;
@@ -36,6 +37,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
 
     private OnDownClickListener mListener = null ;
 
+    private BottomMenuActivity mActivity;
     private RetrofitInterface retrofit;
 
     private List<Down> mMusicList;
@@ -51,7 +53,8 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
         this.mListener = listener ;
     }
 
-    public DownloadAdapter(List<Down> mMusicList, String mAuth, RetrofitInterface retrofit) {
+    public DownloadAdapter(BottomMenuActivity activity, List<Down> mMusicList, String mAuth, RetrofitInterface retrofit) {
+        this.mActivity = activity;
         this.mMusicList = mMusicList;
         this.mAuth = mAuth;
         this.retrofit = retrofit;
@@ -74,6 +77,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
                 if (item.getHornId().equals("")) {
                     Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기가 불가능한 음원 입니다.", Toast.LENGTH_SHORT).show();
                 } else {
+                    mActivity.onEventListen();
                     retrofit.getPCM(mAuth, item.getHornId())
                             .enqueue(new Callback<ResponseBody>() {
                                 @Override

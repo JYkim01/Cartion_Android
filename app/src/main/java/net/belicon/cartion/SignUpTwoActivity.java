@@ -4,6 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -57,6 +61,56 @@ public class SignUpTwoActivity extends AppCompatActivity implements View.OnClick
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         onSingUp = new SignUpPresenter(SignUpTwoActivity.this, this, mAuth, mRetInterface);
+
+        mPasswordEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (before == 1) {
+                    mJoinPwMessage.setVisibility(View.VISIBLE);
+                } else {
+                    if (s.length() > 5) {
+                        mJoinPwMessage.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        mPasswordConfirmEdit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                Log.e("PASSWORD TEXT", "CarSequence = " + s + " ,start = " + start + " ,before = " + before + " ,count = " + count);
+                if (!mPasswordEdit.getText().toString().contentEquals(s)) {
+                    mJoinPwConfirmMessage.setVisibility(View.VISIBLE);
+
+                } else {
+//                    if (mPasswordEdit.getText().toString().contentEquals(s)) {
+                        mJoinPwConfirmMessage.setVisibility(View.GONE);
+//                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        mPhoneEdit.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
     }
 
     @Override
