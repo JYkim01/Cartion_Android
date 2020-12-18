@@ -23,6 +23,9 @@ import net.belicon.cartion.presenters.SignUpPresenter;
 import net.belicon.cartion.retrofites.RetrofitInterface;
 import net.belicon.cartion.retrofites.RetrofitUtility;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class SignUpTwoActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -99,7 +102,7 @@ public class SignUpTwoActivity extends AppCompatActivity implements View.OnClick
 
                 } else {
 //                    if (mPasswordEdit.getText().toString().contentEquals(s)) {
-                        mJoinPwConfirmMessage.setVisibility(View.GONE);
+                    mJoinPwConfirmMessage.setVisibility(View.GONE);
 //                    }
                 }
             }
@@ -123,7 +126,13 @@ public class SignUpTwoActivity extends AppCompatActivity implements View.OnClick
                 imm.hideSoftInputFromWindow(mPhoneEdit.getWindowToken(), 0);
                 break;
             case R.id.join_email_confirm_btn:
-                onEmailConfirmBtn();
+                Pattern p = Pattern.compile("[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\\\-]{0,25})+");
+                Matcher m = p.matcher(mEmailEdit.getText().toString());
+                if (m.matches()) {
+                    onEmailConfirmBtn();
+                } else {
+                    Toast.makeText(this, "Email 형식이 아닙니다.", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.join_password_edit:
                 mJoinPwMessage.setVisibility(View.GONE);
@@ -132,7 +141,7 @@ public class SignUpTwoActivity extends AppCompatActivity implements View.OnClick
                 mJoinPwConfirmMessage.setVisibility(View.GONE);
                 break;
             case R.id.join_success_btn:
-                String phone = mPhoneEdit.getText().toString();
+                String phone = mPhoneEdit.getText().toString().replaceAll("-", "");
                 String password = mPasswordEdit.getText().toString();
                 String confirmPassword = mPasswordConfirmEdit.getText().toString();
                 onSingUp.setOnJoin(mJoinPwMessage, mJoinPwConfirmMessage, email, password, phone, confirmPassword);

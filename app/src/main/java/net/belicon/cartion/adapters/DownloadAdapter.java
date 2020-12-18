@@ -6,6 +6,7 @@ import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -35,7 +36,8 @@ import retrofit2.Response;
 
 public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.DownloadViewHolder> {
 
-    private OnDownClickListener mListener = null ;
+    private OnDownClickListener mListener = null;
+    private OnDownTouchListener mTouchListener = null;
 
     private BottomMenuActivity mActivity;
     private RetrofitInterface retrofit;
@@ -49,8 +51,16 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
         void onItemClick(View v, int position);
     }
 
+    public interface OnDownTouchListener {
+        void onItemTouch(View v, MotionEvent event);
+    }
+
     public void setOnItemClickListener(OnDownClickListener listener) {
-        this.mListener = listener ;
+        this.mListener = listener;
+    }
+
+    public void setOnItemTouchListener(OnDownTouchListener listener) {
+        this.mTouchListener = listener;
     }
 
     public DownloadAdapter(BottomMenuActivity activity, List<Down> mMusicList, String mAuth, RetrofitInterface retrofit) {
@@ -70,32 +80,41 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
     public void onBindViewHolder(@NonNull DownloadViewHolder holder, int position) {
         Down item = mMusicList.get(position);
         holder.mMusicPositionText.setText(String.valueOf(position + 1));
+        if (item.getCategoryName().equals("기본")) {
+            holder.mMusicCategoryText.setText("카션 " + item.getCategoryName() + "음");
+        } else {
+            holder.mMusicCategoryText.setText("카션 " + item.getCategoryName());
+        }
         holder.mMusicTitleText.setText(item.getName());
         holder.mMusicPreviewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (item.getHornId().equals("")) {
-                    Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기가 불가능한 음원 입니다.", Toast.LENGTH_SHORT).show();
-                } else {
-                    mActivity.onEventListen();
-                    retrofit.getPCM(mAuth, item.getHornId())
-                            .enqueue(new Callback<ResponseBody>() {
-                                @Override
-                                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                    if (response.code() == 200) {
-                                        try {
-                                            playWav(holder.mMusicPreviewBtn.getContext(), response.body().bytes(), item.getName());
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
+                if (!isPlaying) {
+                    if (item.getHornId().equals("")) {
+                        Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기가 불가능한 음원 입니다.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        mActivity.onEventListen();
+                        retrofit.getPCM(mAuth, item.getHornId())
+                                .enqueue(new Callback<ResponseBody>() {
+                                    @Override
+                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                        if (response.code() == 200) {
+                                            try {
+                                                playWav(holder.mMusicPreviewBtn.getContext(), response.body().bytes(), item.getName());
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
                                         }
                                     }
-                                }
 
-                                @Override
-                                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                                    @Override
+                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                                }
-                            });
+                                    }
+                                });
+                    }
+                } else {
+                    Toast.makeText(mActivity, "다른 음원이 재생 중 입니다.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -121,7 +140,22 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
             mediaPlayer.setDataSource(context.getCacheDir() + "/" + name + ".wav");
 
             mediaPlayer.prepare();
-            mediaPlayer.start();
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    if (!isPlaying) {
+                        mediaPlayer.start();
+                        isPlaying = true;
+                    }
+                }
+            });
+
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    isPlaying = false;
+                }
+            });
         } catch (IOException ex) {
             String s = ex.toString();
             ex.printStackTrace();
@@ -131,6 +165,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
     public class DownloadViewHolder extends RecyclerView.ViewHolder {
 
         private TextView mMusicPositionText;
+        private TextView mMusicCategoryText;
         private TextView mMusicTitleText;
         private ImageButton mMusicPreviewBtn;
         private ImageButton mMusicDownloadBtn;
@@ -139,6 +174,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
             super(itemView);
 
             mMusicPositionText = itemView.findViewById(R.id.item_download_position_text);
+            mMusicCategoryText = itemView.findViewById(R.id.item_download_category_text);
             mMusicTitleText = itemView.findViewById(R.id.item_download_title_text);
             mMusicPreviewBtn = itemView.findViewById(R.id.item_download_preview_btn);
             mMusicDownloadBtn = itemView.findViewById(R.id.item_download_download_btn);
@@ -153,6 +189,16 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
                             mListener.onItemClick(v, pos);
                         }
                     }
+                }
+            });
+
+            itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (mTouchListener != null) {
+                        mTouchListener.onItemTouch(v, event);
+                    }
+                    return true;
                 }
             });
         }

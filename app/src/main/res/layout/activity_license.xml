@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".LicenseActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:fontFamily="@font/scd5"
+            android:text="License"
+            android:textColor="@color/color_7F44A6"
+            android:textSize="14.23sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/color_D9D9D9" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/scd5"
+                    android:text="Android - AOSP"
+                    android:textColor="@android:color/black"
+                    android:textSize="11.39sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="https://source.android.com/setup/start/licenses?hl=ko"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="Apache License 2.0"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/scd5"
+                    android:text="Android - Android Developers"
+                    android:textColor="@android:color/black"
+                    android:textSize="11.39sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="https://developer.android.com/google/play/licensing?hl=ko"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="Apache License 2.0"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/scd5"
+                    android:text="Firebase-auth"
+                    android:textColor="@android:color/black"
+                    android:textSize="11.39sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="https://firebase.google.com/docs/auth"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="Apache License 2.0"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/scd5"
+                    android:text="TedPermission"
+                    android:textColor="@android:color/black"
+                    android:textSize="11.39sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="https://github.com/ParkSangGwon/TedPermission"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="Apache License 2.0"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/scd5"
+                    android:text="FastBle"
+                    android:textColor="@android:color/black"
+                    android:textSize="11.39sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="https://github.com/Jasonchenlijian/FastBle"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="Apache License 2.0"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/scd5"
+                    android:text="Retrofit 2"
+                    android:textColor="@android:color/black"
+                    android:textSize="11.39sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="https://square.github.io/retrofit/"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="Apache License 2.0"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/scd5"
+                    android:text="Glide"
+                    android:textColor="@android:color/black"
+                    android:textSize="11.39sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="https://github.com/bumptech/glide"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="Apache License 2.0"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/scd5"
+                    android:text="RollingBanner"
+                    android:textColor="@android:color/black"
+                    android:textSize="11.39sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="https://github.com/WindSekirun/RollingBanner"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="Apache License 2.0"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/scd5"
+                    android:text="PhotoView"
+                    android:textColor="@android:color/black"
+                    android:textSize="11.39sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="https://github.com/chrisbanes/PhotoView"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
+                    android:autoLink="web"
+                    android:fontFamily="@font/scd4"
+                    android:text="Apache License 2.0"
+                    android:textColor="@color/color_606060"
+                    android:textSize="11.39sp" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</RelativeLayout>

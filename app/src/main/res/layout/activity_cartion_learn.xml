@@ -30,6 +30,11 @@
             android:textColor="@color/color_7F44A6"
             android:textSize="18.03sp" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/color_606060" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/learn_recycler_view"
             android:layout_width="match_parent"

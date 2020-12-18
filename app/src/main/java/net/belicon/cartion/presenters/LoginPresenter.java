@@ -56,9 +56,10 @@ public class LoginPresenter implements MainConstants.OnLogin {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            onVerify(email, password, dialog);
+                                onVerify(email, password, dialog);
                         } else {
-                            Log.e("AUTH ERROR", task.getException().getLocalizedMessage() + "");
+                            dialog.setVisibility(View.GONE);
+                            Toast.makeText(context, "ID/패스워드가 다릅니다.", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -92,7 +93,7 @@ public class LoginPresenter implements MainConstants.OnLogin {
                                 }
                             } else if (response.code() == 400) {
                                 dialog.setVisibility(View.GONE);
-                                Toast.makeText(context, "회원정보가 맞지 않습니다.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "ID/비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show();
                             } else {
                                 dialog.setVisibility(View.GONE);
                                 Toast.makeText(context, "로그인 실패", Toast.LENGTH_SHORT).show();

@@ -354,13 +354,6 @@
                             android:layout_height="wrap_content"
                             android:visibility="gone">
 
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:layout_marginStart="5dp"
-                                android:src="@drawable/ic_moblie_switch_label_1" />
-
                             <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/home_mobile_switch_36_recycler_view"
                                 android:layout_width="match_parent"
@@ -375,6 +368,15 @@
                                 android:paddingEnd="15dp"
                                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                                 app:spanCount="2" />
+
+                            <ImageButton
+                                android:id="@+id/home_event_mode_36_btn"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_marginStart="5dp"
+                                android:background="@null"
+                                android:src="@drawable/ic_moblie_switch_label_1" />
 
                         </RelativeLayout>
 
@@ -411,13 +413,6 @@
                             android:layout_height="wrap_content"
                             android:visibility="gone">
 
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
-                                android:layout_marginStart="5dp"
-                                android:src="@drawable/ic_moblie_switch_label_2" />
-
                             <androidx.recyclerview.widget.RecyclerView
                                 android:id="@+id/home_mobile_switch_710_recycler_view"
                                 android:layout_width="match_parent"
@@ -432,6 +427,15 @@
                                 android:paddingEnd="15dp"
                                 app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                                 app:spanCount="2" />
+
+                            <ImageButton
+                                android:id="@+id/home_event_mode_710_btn"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_marginStart="5dp"
+                                android:background="@null"
+                                android:src="@drawable/ic_moblie_switch_label_2" />
 
                         </RelativeLayout>
 

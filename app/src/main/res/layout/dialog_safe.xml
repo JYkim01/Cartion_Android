@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/purple_round_box_2">
+
+    <!--    <androidx.cardview.widget.CardView-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_centerInParent="true"-->
+    <!--        android:background="@drawable/white_round_box_2"-->
+    <!--        app:cardBackgroundColor="@color/color_A281DE"-->
+    <!--        app:cardCornerRadius="10dp"-->
+    <!--        app:cardElevation="1dp"-->
+    <!--        app:cardMaxElevation="1dp"-->
+    <!--        app:cardPreventCornerOverlap="true"-->
+    <!--        app:cardUseCompatPadding="true">-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="4dp"
+            android:fontFamily="@font/scd7"
+            android:gravity="center_vertical"
+            android:text="주의사항"
+            android:textColor="@color/color_F1E103"
+            app:drawableStartCompat="@drawable/ic_common_logo" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/scd5"
+            android:gravity="center_horizontal"
+            android:text="모바일 스위치는 운전중 사용을 금지하고\n이벤트 활용시 사용하세요."
+            android:textColor="@android:color/white"
+            android:textSize="12.34sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/scd5"
+            android:gravity="center_horizontal"
+            android:text="* 보조석 탑승자가 사용하여도 됩니다."
+            android:textColor="@android:color/white"
+            android:textSize="10.44sp" />
+
+        <CheckBox
+            android:id="@+id/safe_check_box"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:buttonTint="@android:color/white"
+            android:fontFamily="@font/scd3"
+            android:text="다시 표시하지 않음"
+            android:textColor="@android:color/white"
+            android:textSize="10.44sp" />
+
+        <ImageButton
+            android:id="@+id/safe_confirm_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:background="@null"
+            android:src="@drawable/ic_confirm_button" />
+
+    </LinearLayout>
+
+    <!--    </androidx.cardview.widget.CardView>-->
+
+</RelativeLayout>

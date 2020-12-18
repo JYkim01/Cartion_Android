@@ -1,6 +1,7 @@
 package net.belicon.cartion.adapters;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,13 +31,22 @@ public class ChangeAdapter extends RecyclerView.Adapter<ChangeAdapter.ChangeView
     private List<UserMobile> mMusicList;
 
     private OnChangeClickListener mListener = null;
+    private OnChangeTouchListener mTouchListener = null;
 
     public interface OnChangeClickListener {
         void onItemClick(View v, int position);
     }
 
+    public interface OnChangeTouchListener {
+        void onItemTouch(View v, MotionEvent event);
+    }
+
     public void setOnItemClickListener(OnChangeClickListener listener) {
         this.mListener = listener;
+    }
+
+    public void setOnItemTouchListener(OnChangeTouchListener listener) {
+        this.mTouchListener = listener;
     }
 
     public ChangeAdapter(BottomMenuActivity activity, List<UserMobile> mMusicList) {
@@ -54,6 +64,11 @@ public class ChangeAdapter extends RecyclerView.Adapter<ChangeAdapter.ChangeView
     public void onBindViewHolder(@NonNull ChangeViewHolder holder, int position) {
         UserMobile item = mMusicList.get(position);
         holder.mMusicPositionText.setText(String.valueOf(position + 1));
+        if (item.getCategoryName().equals("기본")) {
+            holder.mMusicCategoryText.setText("카션 " + item.getCategoryName() + "음");
+        } else {
+            holder.mMusicCategoryText.setText("카션 " + item.getCategoryName());
+        }
         holder.mMusicTitleText.setText(item.getHornName());
     }
 
@@ -87,12 +102,14 @@ public class ChangeAdapter extends RecyclerView.Adapter<ChangeAdapter.ChangeView
     class ChangeViewHolder extends RecyclerView.ViewHolder {
 
         private TextView mMusicPositionText;
+        private TextView mMusicCategoryText;
         private TextView mMusicTitleText;
 
         public ChangeViewHolder(@NonNull View itemView) {
             super(itemView);
 
             mMusicPositionText = itemView.findViewById(R.id.item_change_position_text);
+            mMusicCategoryText = itemView.findViewById(R.id.item_change_category_text);
             mMusicTitleText = itemView.findViewById(R.id.item_change_title_text);
 
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -110,6 +127,16 @@ public class ChangeAdapter extends RecyclerView.Adapter<ChangeAdapter.ChangeView
                             mListener.onItemClick(v, pos);
                         }
                     }
+                }
+            });
+
+            itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (mTouchListener != null) {
+                        mTouchListener.onItemTouch(v, event);
+                    }
+                    return true;
                 }
             });
         }

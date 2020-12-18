@@ -28,17 +28,21 @@ public class AppInformationActivity extends AppCompatActivity implements View.On
         mInfoPermissionText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent= new Intent(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(Uri.parse("package:" + getPackageName())));
+                Intent intent = new Intent(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(Uri.parse("package:" + getPackageName())));
                 startActivity(intent);
             }
         });
 
+        findViewById(R.id.app_info_license_btn).setOnClickListener(this);
         findViewById(R.id.app_info_eula_btn).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.app_info_license_btn:
+                startActivity(new Intent(this, LicenseActivity.class));
+                break;
             case R.id.app_info_eula_btn:
                 startActivity(new Intent(this, EulaActivity.class));
                 break;

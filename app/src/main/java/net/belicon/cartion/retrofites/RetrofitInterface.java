@@ -115,4 +115,8 @@ public interface RetrofitInterface {
 
     @DELETE("/api/{userId}/device/{deviceId}")
     Call<MyPage> deleteCartion(@Header("Authorization") String token, @Path("userId") String userId, @Path("deviceId") String deviceId);
+
+    @Headers("Content-Type: application/json")
+    @PUT("/api/device/{deviceId}")
+    Call<MyPage> putCartionName(@Header("Authorization") String token, @Path("deviceId") String deviceId, @Body Cartion body);
 }

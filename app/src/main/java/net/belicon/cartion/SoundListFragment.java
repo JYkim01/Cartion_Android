@@ -1,5 +1,7 @@
 package net.belicon.cartion;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -44,6 +46,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
     private TabLayout mSoundListTabLayout;
     private RecyclerView mSoundListRecyclerView;
     private Spinner mCategorySpinner;
+    private TextView mSoundCustomHornLink;
 //    private TextView mMoreBtn;
 //    private MaterialSpinner mSoundListMaterialSpinner;
 
@@ -72,6 +75,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
         mSoundListTabLayout = view.findViewById(R.id.sound_list_tab_layout);
         mSoundListRecyclerView = view.findViewById(R.id.sound_list_recycler_view);
         mCategorySpinner = view.findViewById(R.id.sound_list_search_spinner);
+        mSoundCustomHornLink = view.findViewById(R.id.sound_custom_horn_message);
 //        mMoreBtn = view.findViewById(R.id.sound_list_more_btn);
 
         mRetInterface = RetrofitUtility.getRetrofitInterface();
@@ -82,6 +86,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
         }
 
         view.findViewById(R.id.sound_list_search_btn).setOnClickListener(this);
+        mSoundCustomHornLink.setOnClickListener(this);
 //        mMoreBtn.setOnClickListener(this);
 
         type = "horn";
@@ -89,11 +94,15 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 int pos = tab.getPosition();
+                mMusicList.clear();
+                mAdapter.notifyDataSetChanged();
                 if (pos == 0) {
                     type = "horn";
+                    mSoundCustomHornLink.setVisibility(View.GONE);
                     onSoundResponse();
                 } else {
                     type = "customHorn";
+                    mSoundCustomHornLink.setVisibility(View.VISIBLE);
                     onMySoundResponse();
                 }
             }
@@ -193,7 +202,11 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                 if (lastVisibleItemPosition == itemTotalCount) {
                     Log.d("RECYCLER VIEW", "last Position...");
                     limit = limit + 10;
-                    onSoundResponse();
+                    if (mSoundListTabLayout.getSelectedTabPosition() == 0) {
+                        onSoundResponse();
+                    } else {
+                        onMySoundResponse();
+                    }
                 }
             }
         });
@@ -210,7 +223,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
 
     private void onSoundResponse() {
         mMusicList.clear();
-        mRetInterface.getMusicList("Bearer " + User.getUserToken(), "" + offset, "" + limit, categoryPos)
+        mRetInterface.getMusicList(token, "" + offset, "" + limit, categoryPos)
                 .enqueue(new Callback<Horn>() {
                     @Override
                     public void onResponse(Call<Horn> call, Response<Horn> response) {
@@ -223,6 +236,8 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                                 }
                                 mAdapter.notifyDataSetChanged();
                             }
+                        } else {
+                            categoryPos = "";
                         }
                     }
 
@@ -265,6 +280,9 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                 mSoundListTabLayout.selectTab(mSoundListTabLayout.getTabAt(0));
                 onSoundResponse();
 //                mMoreBtn.setVisibility(View.VISIBLE);
+                break;
+            case R.id.sound_custom_horn_message:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.cartion.co.kr/front/goods/goodsDetail.do?goodsNo=G2012161053_0016")));
                 break;
 //            case R.id.sound_list_more_btn:
 //                limit = 9999;

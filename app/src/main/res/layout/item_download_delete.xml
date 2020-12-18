@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground"
     android:orientation="vertical">
 
     <LinearLayout
@@ -21,7 +20,7 @@
             android:padding="2dp">
 
             <TextView
-                android:id="@+id/item_change_position_text"
+                android:id="@+id/item_down_delete_position_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -34,7 +33,6 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/item_change_category_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -47,7 +45,7 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/item_change_title_text"
+            android:id="@+id/item_down_delete_title_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -59,6 +57,14 @@
             android:text="빵빵 양보해 주셔서 감사합니다"
             android:textColor="@android:color/white"
             android:textSize="11.39sp" />
+
+        <ImageButton
+            android:id="@+id/item_down_delete_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="18dp"
+            android:background="@null"
+            android:src="@drawable/down_delete_drawable" />
 
     </LinearLayout>
 

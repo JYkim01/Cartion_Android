@@ -138,7 +138,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
             @Override
             public void onClick(View v) {
                 if (mDownList.contains(mMusicList.get(position).getHornName() + ".wav")) {
-                    Toast.makeText(holder.mMusicDownloadBtn.getContext(), "이미 존재하는 음원입니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(holder.mMusicDownloadBtn.getContext(), "이미 다운받은 음원입니다", Toast.LENGTH_SHORT).show();
                 } else {
                     retrofit.getADPCM(mAuth, mMusicList.get(position).getHornId())
                             .enqueue(new Callback<ResponseBody>() {
@@ -157,7 +157,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
                                                 data.setHornName(mMusicList.get(position).getHornName() + ".wav");
                                                 data.setHornType(type);
                                                 data.setHornId(mMusicList.get(position).getHornId());
-                                                data.setCategoryName(categoryName);
+                                                data.setCategoryName(mMusicList.get(position).getCategoryName());
                                                 data.setWavPath(mMusicList.get(position).getAdpcmPath());
                                             }
                                         });

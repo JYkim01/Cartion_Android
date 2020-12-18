@@ -19,11 +19,11 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/item_36_switch_pos_text"
+                android:id="@+id/item_36_event_pos_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:background="@drawable/ic_sound_list_flag2"
+                android:background="@drawable/ic_sound_list_flag3"
                 android:fontFamily="@font/scd7"
                 android:gravity="center"
                 android:padding="2dp"
@@ -32,18 +32,18 @@
                 android:textSize="9.49sp" />
 
             <TextView
-                android:id="@+id/item_36_switch_type"
+                android:id="@+id/item_36_event_type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:fontFamily="@font/scd6"
                 android:gravity="center_horizontal"
                 android:text="카션 안점음"
-                android:textColor="@color/color_A281DE"
+                android:textColor="@color/color_FC5F3A"
                 android:textSize="9sp" />
 
             <TextView
-                android:id="@+id/item_36_switch_play_name"
+                android:id="@+id/item_36_event_play_name"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginStart="10dp"

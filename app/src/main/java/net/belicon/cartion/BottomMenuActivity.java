@@ -42,11 +42,13 @@ import android.view.animation.Animation;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleGattCallback;
 import com.clj.fastble.callback.BleNotifyCallback;
@@ -64,6 +66,7 @@ import net.belicon.cartion.R;
 import net.belicon.cartion.adapters.BannerPagerAdapter;
 import net.belicon.cartion.adapters.ChangeAdapter;
 import net.belicon.cartion.adapters.DownloadAdapter;
+import net.belicon.cartion.adapters.DownloadDeleteAdapter;
 import net.belicon.cartion.adapters.IotSwitchAdapter;
 import net.belicon.cartion.adapters.Mobile36SwitchAdapter;
 import net.belicon.cartion.adapters.Mobile710SwitchAdapter;
@@ -80,6 +83,7 @@ import net.belicon.cartion.models.RefreshToken;
 import net.belicon.cartion.models.SwitchList;
 import net.belicon.cartion.models.User;
 import net.belicon.cartion.models.UserMobile;
+import net.belicon.cartion.retrofites.GlideApp;
 import net.belicon.cartion.retrofites.RetrofitInterface;
 import net.belicon.cartion.retrofites.RetrofitUtility;
 
@@ -90,6 +94,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EventListener;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -118,7 +123,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
     private RelativeLayout mSearchContainer, m36Container, m710Container;
     private LinearLayout mInfoContainer;
     private TextView mSearchNotiText, mNicNameText, mBatteryText, mTemperatureText;
-    private ImageButton mCartionSearchBtn, m36PurchaseBtn, m710PurchaseBtn;
+    private ImageButton mCartionSearchBtn, m36PurchaseBtn, m710PurchaseBtn, mEvent36Btn, mEvent710Btn;
     private View m36Line, m710Line;
     private FrameLayout mHomeDialog;
 
@@ -143,6 +148,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
     private byte[] convertByte;
     private boolean isUserCheck = false;
     private long pressedTime;
+    private boolean isEventMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,6 +182,8 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         m36PurchaseBtn = findViewById(R.id.home_mobile_switch_36_purchase_btn);
         m710PurchaseBtn = findViewById(R.id.home_mobile_switch_710_purchase_btn);
         mHomeDialog = findViewById(R.id.home_dialog);
+        mEvent36Btn = findViewById(R.id.home_event_mode_36_btn);
+        mEvent710Btn = findViewById(R.id.home_event_mode_710_btn);
 
         String noti = mSearchNotiText.getText().toString();
         String cn = "'검색 버튼'";
@@ -205,13 +213,17 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 .enableLog(true)
                 .setReConnectCount(3, 3000)
                 .setSplitWriteNum(17)
-                .setConnectOverTime(20000)
+                .setConnectOverTime(100000)
                 .setOperateTimeout(5000);
 
         mCartionSearchBtn.setOnClickListener(this);
 
         findViewById(R.id.home_switch_change_btn).setOnClickListener(this);
         findViewById(R.id.home_lost_switch_btn).setOnClickListener(this);
+        findViewById(R.id.home_mobile_switch_36_purchase_btn).setOnClickListener(this);
+        findViewById(R.id.home_mobile_switch_710_purchase_btn).setOnClickListener(this);
+        findViewById(R.id.home_event_mode_36_btn).setOnClickListener(this);
+        findViewById(R.id.home_event_mode_710_btn).setOnClickListener(this);
 
         mSwitchMusic = new ArrayList<>();
         mDownMusic = new ArrayList<>();
@@ -267,7 +279,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         } else {
             Log.e("BLE", "ON");
         }
-
         if (Realm.getDefaultInstance() != null) {
             realm = Realm.getDefaultInstance();
         }
@@ -290,6 +301,8 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     String content = list.get(0).getCouponText();
                                     String value = list.get(0).getCouponValue();
                                     onCouponView(value);
+                                } else {
+                                    onSafeView();
                                 }
                             }
                         }
@@ -370,6 +383,16 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         });
     }
 
+    private void onSafeView() {
+        SharedPreferences preferences = getSharedPreferences("safe_key", Context.MODE_PRIVATE);
+        if (preferences != null) {
+            boolean safe = preferences.getBoolean("safe", false);
+            if (!safe) {
+                new SafeNotiDialogFragment().show(getSupportFragmentManager(), "safe_dialog");
+            }
+        }
+    }
+
     public void onServerDevice() {
         if (mAuth.getCurrentUser() != null) {
             mRetInterface.getUserData(token, mAuth.getCurrentUser().getEmail())
@@ -387,9 +410,11 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     if (macList.size() != 0) {
                                         isUserCheck = true;
                                         mac = devices.get(0).getDeviceMac();
+                                        mNicNameText.setText(devices.get(0).getDeviceName());
                                         Log.e("USER MAC", mac);
                                     } else {
                                         isUserCheck = false;
+                                        mNicNameText.setText("Cartion");
                                     }
                                     startScan();
                                 }
@@ -509,7 +534,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 String CHARACTERISTIC_UUID = gatt.getServices().get(2).getCharacteristics().get(1).getUuid().toString();
                 Log.e("SERVICE UUID", SERVICE_UUID);
                 Log.e("CHARACTERISTIC UUID", CHARACTERISTIC_UUID);
-                mNicNameText.setText(mBleDevice.getName());
                 notified(bleDevice, SERVICE_UUID, CHARACTERISTIC_UUID);
                 onSwitch();
             }
@@ -619,13 +643,60 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     anim.setRepeatCount(Animation.INFINITE);
                                     mBatteryText.setText(battery);
 //                                    Log.e("TESTSESTS", Integer.parseInt(battery.replace("%", "")) + "");
-                                    if (Integer.parseInt(battery.replace("%", "")) <= 25) {
+                                    if (Integer.parseInt(battery.replace("%", "").replace(" ", "")) <= 25) {
                                         mBatteryText.setTextColor(Color.RED);
                                         mBatteryText.startAnimation(anim);
                                         Toast.makeText(BottomMenuActivity.this, "충전이 필요합니다.", Toast.LENGTH_LONG).show();
                                     }
                                 } else if (s.contains("Temperature") && !s.contains("Max Temperature")) {
                                     mTemperatureText.setText(s.replace("Temperature:", "") + "°C");
+                                }
+                                if (s.contains("EEM:0")) {
+                                    Log.e("Event Mode", "Enabled");
+                                    isEventMode = true;
+                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_event_switch_label).into(mEvent36Btn);
+                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_event_switch_label).into(mEvent710Btn);
+                                    mMobileSwitch36RecyclerView.setBackgroundResource(R.drawable.ic_event_switch_background);
+                                    mMobileSwitch710RecyclerView.setBackgroundResource(R.drawable.ic_event_switch_background);
+                                    if (mMobile36SwitchAdapter != null) {
+                                        mMobile36SwitchAdapter.setItemViewType(Mobile36SwitchAdapter.EVENT_TYPE);
+                                        mMobile710SwitchAdapter.setItemViewType(Mobile710SwitchAdapter.EVENT_TYPE);
+                                    }
+                                } else if (s.contains("EEM:1")) {
+                                    Log.e("Event Mode", "Disabled");
+                                    isEventMode = false;
+                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_moblie_switch_label_1).into(mEvent36Btn);
+                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_moblie_switch_label_2).into(mEvent710Btn);
+                                    mMobileSwitch36RecyclerView.setBackgroundResource(R.drawable.ic_background_3_10);
+                                    mMobileSwitch710RecyclerView.setBackgroundResource(R.drawable.ic_background_3_10);
+                                    if (mMobile36SwitchAdapter != null) {
+                                        mMobile36SwitchAdapter.setItemViewType(Mobile36SwitchAdapter.NORMAL_TYPE);
+                                        mMobile710SwitchAdapter.setItemViewType(Mobile710SwitchAdapter.NORMAL_TYPE);
+                                    }
+                                }
+                                if (s.contains("Event Mode Enabled")) {
+                                    isEventMode = true;
+                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_event_switch_label).into(mEvent36Btn);
+                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_event_switch_label).into(mEvent710Btn);
+                                    mMobileSwitch36RecyclerView.setBackgroundResource(R.drawable.ic_event_switch_background);
+                                    mMobileSwitch710RecyclerView.setBackgroundResource(R.drawable.ic_event_switch_background);
+                                    if (mMobile36SwitchAdapter != null) {
+                                        mMobile36SwitchAdapter.setItemViewType(Mobile36SwitchAdapter.EVENT_TYPE);
+                                        mMobile710SwitchAdapter.setItemViewType(Mobile710SwitchAdapter.EVENT_TYPE);
+                                    }
+                                } else if (s.contains("Event Mode Disabled")) {
+                                    isEventMode = false;
+                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_moblie_switch_label_1).into(mEvent36Btn);
+                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_moblie_switch_label_2).into(mEvent710Btn);
+                                    mMobileSwitch36RecyclerView.setBackgroundResource(R.drawable.ic_background_3_10);
+                                    mMobileSwitch710RecyclerView.setBackgroundResource(R.drawable.ic_background_3_10);
+                                    if (mMobile36SwitchAdapter != null) {
+                                        mMobile36SwitchAdapter.setItemViewType(Mobile36SwitchAdapter.NORMAL_TYPE);
+                                        mMobile710SwitchAdapter.setItemViewType(Mobile710SwitchAdapter.NORMAL_TYPE);
+                                    }
+                                }
+                                if (s.contains("CTE")) {
+                                    Log.e("CTE", s);
                                 }
                                 mHomeDialog.setVisibility(View.GONE);
                             }
@@ -830,15 +901,29 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                 mIotSwitchAdapter.notifyDataSetChanged();
                                 mMobile36SwitchAdapter.notifyDataSetChanged();
                                 mMobile710SwitchAdapter.notifyDataSetChanged();
+                                onEventListen();
                                 dialog.dismiss();
                             }
 
                             @Override
                             public void onFailure(Call<MyPage> call, Throwable t) {
                                 Toast.makeText(BottomMenuActivity.this, "순서변경 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+                                onEventListen();
                                 dialog.dismiss();
                             }
                         });
+            }
+        });
+
+        adapter.setOnItemTouchListener(new ChangeAdapter.OnChangeTouchListener() {
+            @Override
+            public void onItemTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        onEventListen();
+                        break;
+                }
             }
         });
     }
@@ -861,6 +946,8 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         return dataBytes;
     }
 
+    private boolean isDelete = false;
+
     private void onSoundChange(String mobileSwitch, String index) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.dialog_download, null);
@@ -870,16 +957,21 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         File[] files = file.listFiles();
         for (File tempFile : files) {
             String hornId = "";
+            String categoryName = "기본";
             if (realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst() != null) {
                 if (realm.where(UserMobile.class).findAll().size() != 0) {
                     hornId = realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst().getHornId();
+                    categoryName = realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst().getCategoryName();
+                    categoryName = (categoryName == null) ? "기본" : categoryName;
                 } else {
                     hornId = "";
+                    categoryName = "기본";
                 }
             } else {
                 hornId = "";
+                categoryName = "기본";
             }
-            musicList.add(new Down(tempFile.getName(), tempFile, hornId));
+            musicList.add(new Down(tempFile.getName(), tempFile, hornId, categoryName));
         }
         DownloadAdapter adapter = new DownloadAdapter(BottomMenuActivity.this, musicList, token, mRetInterface);
         recyclerView.setAdapter(adapter);
@@ -914,12 +1006,54 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
             }
         });
 
-        view.findViewById(R.id.download_cancel_btn).setOnClickListener(new View.OnClickListener() {
+        ImageButton cancel = view.findViewById(R.id.download_cancel_btn);
+        view.findViewById(R.id.download_setting_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                DownloadDeleteAdapter deleteAdapter = new DownloadDeleteAdapter(musicList);
+                recyclerView.setAdapter(deleteAdapter);
+                isDelete = true;
+                Glide.with(BottomMenuActivity.this).load(R.drawable.ic_confirm_button).into(cancel);
             }
         });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onEventListen();
+                if (isDelete) {
+                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_cancel_button).into(cancel);
+                    recyclerView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                    isDelete = false;
+                } else {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        adapter.setOnItemTouchListener(new DownloadAdapter.OnDownTouchListener() {
+            @Override
+            public void onItemTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        onEventListen();
+                        break;
+                }
+            }
+        });
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        int action = ev.getAction();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                onEventListen();
+                break;
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
     public void convertStreamToByteArray(File file) throws IOException {
@@ -1050,9 +1184,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.bottom_menu_container:
-
-                break;
             case R.id.bottom_home_btn:
                 onEventListen();
 //                getSupportFragmentManager().beginTransaction().add(R.id.bottom_menu_container, new HomeFragment()).addToBackStack(null).commit();
@@ -1083,8 +1214,15 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 getSupportFragmentManager().beginTransaction().add(R.id.bottom_menu_container, new MoreFragment()).addToBackStack(null).commit();
                 break;
             case R.id.home_cartion_search_btn:
-                BleManager.getInstance().disconnectAllDevice();
-                onServerDevice();
+                BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                if (mBluetoothAdapter == null) {
+                    Toast.makeText(this, "블루투스가 지원되지 않습니다.", Toast.LENGTH_SHORT).show();
+                } else if (!mBluetoothAdapter.isEnabled()) {
+                    Toast.makeText(this, "블루투스가 꺼져 있습니다.", Toast.LENGTH_SHORT).show();
+                } else {
+                    BleManager.getInstance().disconnectAllDevice();
+                    onServerDevice();
+                }
                 break;
             case R.id.home_switch_change_btn:
                 onSwitchChange();
@@ -1092,7 +1230,42 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
             case R.id.home_lost_switch_btn:
                 onLostSwitch();
                 break;
+            case R.id.home_event_mode_36_btn:
+            case R.id.home_event_mode_710_btn:
+                if (BleManager.getInstance().isConnected(mBleDevice)) {
+                    String commend;
+                    if (isEventMode) {
+                        isEventMode = false;
+                        commend = "EEM:1";
+                    } else {
+                        isEventMode = true;
+                        commend = "EEM:0";
+                    }
+                    writeData(mBleDevice,
+                            "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+                            "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+                            onEventMode(commend)
+                    );
+                }
+                break;
+            case R.id.home_mobile_switch_36_purchase_btn:
+            case R.id.home_mobile_switch_710_purchase_btn:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.cartion.co.kr/front/goods/goodsDetail.do?goodsNo=G2012161125_0017")));
+                break;
         }
+    }
+
+    private byte[] onEventMode(String commend) {
+        int checksum = 0;
+
+        byte[] bytes = commend.getBytes();
+        byte[] dataBytes = new byte[commend.length() + 1];
+        for (int i = 0; i < commend.length(); i++) {
+            dataBytes[i] = bytes[i];
+            checksum += bytes[i];
+        }
+        dataBytes[commend.length()] = (byte) (checksum % 256);
+        return dataBytes;
     }
 
     private void onIotSwitchListener() {
@@ -1118,6 +1291,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             onCommend0("" + (mSwitchMusic.get(pos).getMobileSwitch() - 1))
                     );
                 }
+                onEventListen();
                 onSoundChange("" + mSwitchMusic.get(pos).getMobileSwitch(), "" + (pos + 1));
             }
         });
@@ -1145,6 +1319,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             onCommend0("" + ((mSwitchMusic.get(position).getMobileSwitch() - 1) + 2))
                     );
                 }
+                onEventListen();
                 onSoundChange("" + mSwitchMusic.get(position + 2).getMobileSwitch(), "" + (position + 3));
             }
         });
@@ -1172,6 +1347,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             onCommend0("" + ((mSwitchMusic.get(position).getMobileSwitch() - 1) + 5))
                     );
                 }
+                onEventListen();
                 onSoundChange("" + mSwitchMusic.get(position + 5).getMobileSwitch(), "" + (position + 6));
             }
         });
@@ -1218,7 +1394,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
                             onLost()
                     );
-                    Toast.makeText(BottomMenuActivity.this, "기존 스위치가 제거 되었습니다. 새로운 스위치를 등록해 주세요.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(BottomMenuActivity.this, "기존 스위치가 제거 되었습니다. 앱을 종료 후, 등록할 스위치의 버튼을 눌러 주세요.", Toast.LENGTH_SHORT).show();
                 }
                 dialog.dismiss();
             }
@@ -1256,7 +1432,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
     public void onEventListen() {
         if (BleManager.getInstance().isConnected(mBleDevice)) {
-            Log.e("COMMEND", "버전 확인");
             writeData(mBleDevice,
                     "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                     "6e400002-b5a3-f393-e0a9-e50e24dcca9e",

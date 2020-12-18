@@ -7,11 +7,13 @@ public class Down {
     private String name;
     private File file;
     private String hornId;
+    private String categoryName;
 
-    public Down(String name, File file, String hornId) {
+    public Down(String name, File file, String hornId, String categoryName) {
         this.name = name;
         this.file = file;
         this.hornId = hornId;
+        this.categoryName = categoryName;
     }
 
     public String getName() {
@@ -38,12 +40,21 @@ public class Down {
         this.hornId = hornId;
     }
 
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
     @Override
     public String toString() {
         return "Down{" +
                 "name='" + name + '\'' +
                 ", file=" + file +
                 ", hornId='" + hornId + '\'' +
+                ", categoryName='" + categoryName + '\'' +
                 '}';
     }
 }

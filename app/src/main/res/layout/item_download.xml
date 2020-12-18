@@ -27,12 +27,13 @@
                 android:background="@drawable/ic_sound_list_small_flag_1"
                 android:fontFamily="@font/scd6"
                 android:gravity="center"
-                android:text="경적1"
+                android:text="음원1"
                 android:textColor="@android:color/white"
                 android:textSize="7.59sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/item_download_category_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"

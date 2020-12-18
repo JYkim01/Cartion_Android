@@ -35,6 +35,7 @@ import com.google.gson.GsonBuilder;
 
 import net.belicon.cartion.adapters.CartionSettingAdapter;
 import net.belicon.cartion.adapters.ChangeAdapter;
+import net.belicon.cartion.models.Cartion;
 import net.belicon.cartion.models.Device;
 import net.belicon.cartion.models.MyPage;
 import net.belicon.cartion.models.PasswordModify;
@@ -46,6 +47,8 @@ import net.belicon.cartion.retrofites.RetrofitUtility;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -68,7 +71,7 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
 
     private DeviceAdapter mAdapter;
     private CartionSettingAdapter mSettingAdapter;
-    private List<String> mDeviceList;
+    private List<Cartion> mDeviceList;
 
     private String token, email, mac;
 
@@ -119,7 +122,9 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
 
                                 for (int i = 0; i < response.body().getData().getDevices().size(); i++) {
                                     String id = response.body().getData().getDevices().get(i).getDeviceId();
-                                    mDeviceList.add(id);
+                                    String mac = response.body().getData().getDevices().get(i).getDeviceMac();
+                                    String name = response.body().getData().getDevices().get(i).getDeviceName();
+                                    mDeviceList.add(new Cartion(id, mac, name));
                                 }
                                 mAdapter = new DeviceAdapter(mDeviceList);
                                 mDeviceRecyclerView.setAdapter(mAdapter);
@@ -208,56 +213,45 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
                 CartionSettingAdapter adapter = new CartionSettingAdapter(((BottomMenuActivity) getActivity()), mRetInterface, BottomMenuActivity.mBleDevice, mDeviceList, token, email);
                 mDeviceRecyclerView.setAdapter(adapter);
                 mConfirmBtn.setVisibility(View.VISIBLE);
-//                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(LAYOUT_INFLATER_SERVICE);
-//                View view = inflater.inflate(R.layout.dialog_cartion_setting, null);
-//                RecyclerView recyclerView = view.findViewById(R.id.cartion_setting_recylcer_view);
-//
-//                CartionSettingAdapter adapter = new CartionSettingAdapter(mRetInterface, mDeviceList, token, email);
-//                recyclerView.setAdapter(adapter);
-//
-//                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//                builder.setView(view);
-//                AlertDialog dialog = builder.create();
-//                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-//                lp.copyFrom(dialog.getWindow().getAttributes());
-//                lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
-//                lp.height = 1800;
-//                dialog.show();
-//                Window window = dialog.getWindow();
-//                window.setAttributes(lp);
-//                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//
-//                view.findViewById(R.id.cartion_setting_cancel_btn).setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        mAdapter.notifyDataSetChanged();
-//                        dialog.dismiss();
-//                    }
-//                });
                 break;
             case R.id.my_page_settings_confirm_btn:
-                mPhoneLine.setVisibility(View.GONE);
-                String phone = mPhoneText.getText().toString();
-                mRetInterface.putPhoneModify(token, email, new PhoneModify(phone))
-                        .enqueue(new Callback<MyPage>() {
-                            @Override
-                            public void onResponse(Call<MyPage> call, Response<MyPage> response) {
-                                if (response.code() == 200) {
-                                    mPhoneText.setEnabled(false);
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<MyPage> call, Throwable t) {
-
-                            }
-                        });
-//                mAdapter = new DeviceAdapter(mDeviceList);
-                mDeviceRecyclerView.setAdapter(mAdapter);
-                mAdapter.notifyDataSetChanged();
-                mConfirmBtn.setVisibility(View.GONE);
+                Pattern p = Pattern.compile("^[a-zA-X0-9]@[a-zA-Z0-9].[a-zA-Z0-9]");
+                Matcher m = p.matcher(mMallEmailText.getText().toString());
+                String phone = mPhoneText.getText().toString().replaceAll("-", "");
+                if (!mMallEmailText.getText().toString().equals("") && !m.matches()) {
+                    Toast.makeText(getActivity(), "쇼핑몰 아이디가 이메일 형식이 아닙니다.", Toast.LENGTH_SHORT).show();
+                } else if (phone.length() != 11) {
+                    Toast.makeText(getActivity(), "전화번호를 다시 확인해주세요.", Toast.LENGTH_SHORT).show();
+                } else {
+                    onModify(phone);
+                }
                 break;
         }
+    }
+
+    private void onModify(String phone) {
+        mMallEmailLine.setVisibility(View.GONE);
+        mMallEmailText.setEnabled(false);
+        mPhoneLine.setVisibility(View.GONE);
+        mPhoneText.setEnabled(false);
+        mRetInterface.putPhoneModify(token, email, new PhoneModify(phone))
+                .enqueue(new Callback<MyPage>() {
+                    @Override
+                    public void onResponse(Call<MyPage> call, Response<MyPage> response) {
+                        if (response.code() == 200) {
+                            // 전화번호 변경
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<MyPage> call, Throwable t) {
+
+                    }
+                });
+//                mAdapter = new DeviceAdapter(mDeviceList);
+        mDeviceRecyclerView.setAdapter(mAdapter);
+        mAdapter.notifyDataSetChanged();
+        mConfirmBtn.setVisibility(View.GONE);
     }
 
 //    private void onPasswordChange() {
@@ -289,9 +283,9 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
 
     private class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder> {
 
-        private List<String> mDeviceList;
+        private List<Cartion> mDeviceList;
 
-        public DeviceAdapter(List<String> mDeviceList) {
+        public DeviceAdapter(List<Cartion> mDeviceList) {
             this.mDeviceList = mDeviceList;
         }
 
@@ -303,7 +297,8 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
 
         @Override
         public void onBindViewHolder(@NonNull DeviceViewHolder holder, int position) {
-            holder.mDeviceText.setText(mDeviceList.get(position));
+            Cartion item = mDeviceList.get(position);
+            holder.mDeviceText.setText(item.getDeviceId() + " (" + item.getDeviceName() + ")");
         }
 
         @Override

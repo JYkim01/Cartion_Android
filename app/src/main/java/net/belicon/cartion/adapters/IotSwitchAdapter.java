@@ -84,13 +84,11 @@ public class IotSwitchAdapter extends RecyclerView.Adapter<IotSwitchAdapter.IotS
                     if (pos != RecyclerView.NO_POSITION) {
                         if (mListener != null) {
                             mListener.onItemClickListener(v, pos);
-                            mTypeText.setTextColor(mTypeText.getContext().getResources().getColor(R.color.color_7F44A6));
                             mNameText.setTextColor(mNameText.getContext().getResources().getColor(R.color.color_531F57));
                             mNameText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_sound_play_icon, 0);
                             new Handler().postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
-                                    mTypeText.setTextColor(mTypeText.getContext().getResources().getColor(R.color.color_A1AAB1));
                                     mNameText.setTextColor(mNameText.getContext().getResources().getColor(R.color.color_A1AAB1));
                                     mNameText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_home_play_button_disable, 0);
                                 }
