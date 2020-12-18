@@ -142,9 +142,15 @@ public class SignUpTwoActivity extends AppCompatActivity implements View.OnClick
                 break;
             case R.id.join_success_btn:
                 String phone = mPhoneEdit.getText().toString().replaceAll("-", "");
+                Pattern phone_p = Pattern.compile("^01(?:0|1|[6-9])[.-]?(?:\\d{3}|\\d{4})[.-]?\\d{4}$");
+                Matcher phone_m = phone_p.matcher(phone);
                 String password = mPasswordEdit.getText().toString();
                 String confirmPassword = mPasswordConfirmEdit.getText().toString();
-                onSingUp.setOnJoin(mJoinPwMessage, mJoinPwConfirmMessage, email, password, phone, confirmPassword);
+                if (phone.length() != 11 || !phone_m.matches()) {
+                    Toast.makeText(this, "전화번호를 다시 확인해주세요.", Toast.LENGTH_SHORT).show();
+                } else {
+                    onSingUp.setOnJoin(mJoinPwMessage, mJoinPwConfirmMessage, email, password, phone, confirmPassword);
+                }
                 break;
         }
     }

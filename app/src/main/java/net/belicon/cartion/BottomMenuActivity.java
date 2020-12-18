@@ -1045,16 +1045,16 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         });
     }
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        int action = ev.getAction();
-        switch (action) {
-            case MotionEvent.ACTION_DOWN:
-                onEventListen();
-                break;
-        }
-        return super.dispatchTouchEvent(ev);
-    }
+//    @Override
+//    public boolean dispatchTouchEvent(MotionEvent ev) {
+//        int action = ev.getAction();
+//        switch (action) {
+//            case MotionEvent.ACTION_DOWN:
+//                onEventListen();
+//                break;
+//        }
+//        return super.dispatchTouchEvent(ev);
+//    }
 
     public void convertStreamToByteArray(File file) throws IOException {
         FileInputStream inStream = new FileInputStream(file);

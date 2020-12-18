@@ -215,12 +215,14 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
                 mConfirmBtn.setVisibility(View.VISIBLE);
                 break;
             case R.id.my_page_settings_confirm_btn:
-                Pattern p = Pattern.compile("^[a-zA-X0-9]@[a-zA-Z0-9].[a-zA-Z0-9]");
-                Matcher m = p.matcher(mMallEmailText.getText().toString());
                 String phone = mPhoneText.getText().toString().replaceAll("-", "");
-                if (!mMallEmailText.getText().toString().equals("") && !m.matches()) {
+                Pattern phone_p = Pattern.compile("^01(?:0|1|[6-9])[.-]?(?:\\d{3}|\\d{4})[.-]?\\d{4}$");
+                Matcher phone_m = phone_p.matcher(phone);
+                Pattern email_p = Pattern.compile("^[a-zA-X0-9]@[a-zA-Z0-9].[a-zA-Z0-9]");
+                Matcher email_m = email_p.matcher(mMallEmailText.getText().toString());
+                if (!mMallEmailText.getText().toString().equals("") && !email_m.matches()) {
                     Toast.makeText(getActivity(), "쇼핑몰 아이디가 이메일 형식이 아닙니다.", Toast.LENGTH_SHORT).show();
-                } else if (phone.length() != 11) {
+                } else if (phone.length() != 11 || !phone_m.matches()) {
                     Toast.makeText(getActivity(), "전화번호를 다시 확인해주세요.", Toast.LENGTH_SHORT).show();
                 } else {
                     onModify(phone);
@@ -252,6 +254,7 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
         mDeviceRecyclerView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
         mConfirmBtn.setVisibility(View.GONE);
+        Toast.makeText(getActivity(), "정보가 변경되었습니다.", Toast.LENGTH_SHORT).show();
     }
 
 //    private void onPasswordChange() {
@@ -298,7 +301,7 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
         @Override
         public void onBindViewHolder(@NonNull DeviceViewHolder holder, int position) {
             Cartion item = mDeviceList.get(position);
-            holder.mDeviceText.setText(item.getDeviceId() + " (" + item.getDeviceName() + ")");
+            holder.mDeviceText.setText(item.getDeviceId() + " : " + item.getDeviceName());
         }
 
         @Override
