@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.clj.fastble.BleManager;
 
 import net.belicon.cartion.BottomMenuActivity;
@@ -90,23 +93,29 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
                 if (music.equals(mMusicList.get(position).getHornId())) {
                     holder.mMusicTitleText.setSelected(true);
                     holder.mMusicTitleText.setTextColor(holder.mMusicTitleText.getContext().getResources().getColor(R.color.color_7F44A6));
+                    Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon).into(holder.mMusicPreviewBtn);
                 } else {
                     holder.mMusicTitleText.setSelected(true);
                     holder.mMusicTitleText.setTextColor(Color.WHITE);
+                    Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
                 }
             } else {
                 holder.mMusicTitleText.setSelected(true);
                 holder.mMusicTitleText.setTextColor(Color.WHITE);
+                Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
             }
         } else {
             holder.mMusicTitleText.setSelected(true);
             holder.mMusicTitleText.setTextColor(Color.WHITE);
+            Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
         }
 
         holder.mMusicPreviewBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isPlaying) {
+//                    isPlaying = true;
+                    Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon).into(holder.mMusicPreviewBtn);
                     music = mMusicList.get(position).getHornId();
                     music_name = mMusicList.get(position).getHornName();
                     retrofit.getPCM(mAuth, music)
@@ -116,16 +125,22 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
                                     Log.e("PCM CODE", "" + response.code());
                                     if (response.code() == 200) {
                                         try {
-                                            playWav(holder.mMusicPreviewBtn.getContext(), holder.mMusicTitleText, response.body().bytes(), music_name);
+                                            playWav(holder.mMusicPreviewBtn.getContext(), holder.mMusicTitleText, holder.mMusicPreviewBtn, response.body().bytes(), music_name);
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
+                                    } else {
+                                        isPlaying = false;
+                                        Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
+                                        Toast.makeText(holder.mMusicPreviewBtn.getContext(), "재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                                     }
                                 }
 
                                 @Override
                                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                                    isPlaying = false;
+                                    Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
+                                    Toast.makeText(holder.mMusicPreviewBtn.getContext(), "재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                                 }
                             });
                 } else {
@@ -201,7 +216,7 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
         }
     }
 
-    private void playWav(Context context, TextView nameTextView, byte[] mp3SoundByteArray, String name) {
+    private void playWav(Context context, TextView nameTextView, ImageButton previewBtn, byte[] mp3SoundByteArray, String name) {
         try {
             File path = new File(context.getCacheDir(), name + ".wav");
 
@@ -209,12 +224,11 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
             fos.write(mp3SoundByteArray);
             fos.close();
 
-            MediaPlayer mediaPlayer = new MediaPlayer();
-
             FileInputStream fis = new FileInputStream(path);
-            mediaPlayer.setDataSource(context.getCacheDir() + "/" + name + ".wav");
 
-            mediaPlayer.prepare();
+            MediaPlayer mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(context.getCacheDir() + "/" + name + ".wav");
+            mediaPlayer.prepareAsync();
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
@@ -235,13 +249,16 @@ public class MusicListAdapter extends RecyclerView.Adapter<MusicListAdapter.Musi
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
+                    Glide.with(previewBtn).load(R.drawable.ic_preview_listening_icon_off).into(previewBtn);
                     nameTextView.setTextColor(Color.WHITE);
                     isPlaying = false;
+                    mediaPlayer.stop();
+                    mediaPlayer.release();
                 }
             });
         } catch (IOException ex) {
             String s = ex.toString();
-            ex.printStackTrace();
+            Log.e("PLAYER ERROR", s);
         }
     }
 

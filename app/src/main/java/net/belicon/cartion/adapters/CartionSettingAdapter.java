@@ -131,8 +131,14 @@ public class CartionSettingAdapter extends RecyclerView.Adapter<CartionSettingAd
                                                             ((BottomMenuActivity) mActivity).writeData(mBleDevice,
                                                                     "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                                                                     "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+                                                                    onReset()
+                                                            );
+                                                            ((BottomMenuActivity) mActivity).writeData(mBleDevice,
+                                                                    "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+                                                                    "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
                                                                     onDelete()
                                                             );
+                                                            ((BottomMenuActivity) mActivity).isUserCheck = false;
                                                             Toast.makeText(holder.mDeleteBtn.getContext(), "삭제 되었습니다.", Toast.LENGTH_SHORT).show();
                                                         }
                                                     }
@@ -159,6 +165,23 @@ public class CartionSettingAdapter extends RecyclerView.Adapter<CartionSettingAd
                 }
             }
         });
+    }
+
+    // 카션 음원 초기화
+    private byte[] onReset() {
+        String post = "SSM:0123456789";
+        int checksum = 0;
+
+        byte[] bytes = post.getBytes();
+        byte[] dataBytes = new byte[post.length() + 1];
+        for (int i = 0; i < bytes.length; i++) {
+            Log.e("GET PSD", bytes[i] + "");
+            dataBytes[i] += bytes[i];
+            checksum += bytes[i];
+        }
+        dataBytes[post.length()] = (byte) (checksum % 256);
+        checksum = 0;
+        return dataBytes;
     }
 
     // 사용자 정보 삭제 커맨드

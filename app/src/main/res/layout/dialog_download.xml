@@ -34,7 +34,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_delete" />
+                android:layout_marginEnd="25dp"
+                android:src="@drawable/selector_delete_drawable" />
 
         </RelativeLayout>
 

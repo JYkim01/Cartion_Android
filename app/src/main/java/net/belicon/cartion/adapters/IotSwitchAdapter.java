@@ -16,7 +16,11 @@ import net.belicon.cartion.models.UserMobile;
 
 import java.util.List;
 
-public class IotSwitchAdapter extends RecyclerView.Adapter<IotSwitchAdapter.IotSwitchViewHolder> {
+public class IotSwitchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    public static final int NORMAL_TYPE = 0;
+    public static final int EVENT_TYPE = 1;
+    private int VIEW_TYPE = 0;
 
     private OnIotClickListener mListener = null;
 
@@ -37,21 +41,48 @@ public class IotSwitchAdapter extends RecyclerView.Adapter<IotSwitchAdapter.IotS
 
     @NonNull
     @Override
-    public IotSwitchViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new IotSwitchViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_iot_switch, parent, false));
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        RecyclerView.ViewHolder view;
+        switch (viewType) {
+            case NORMAL_TYPE:
+                view = new IotSwitchViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_iot_switch, parent, false));
+                break;
+            case EVENT_TYPE:
+                view = new EventIotSwitchViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_event_iot_switch, parent, false));
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + viewType);
+        }
+        return view;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull IotSwitchViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         UserMobile data = mDataList.get(position);
-        holder.mIotText.setText("IoT 스위치" + (position + 1));
-        if (data.getCategoryName().equals("기본")) {
-            holder.mTypeText.setText("카션 " + data.getCategoryName() + "음");
-        } else {
-            holder.mTypeText.setText("카션 " + data.getCategoryName());
+        switch (holder.getItemViewType()) {
+            case NORMAL_TYPE:
+                IotSwitchViewHolder normal = (IotSwitchViewHolder) holder;
+                normal.mIotText.setText("IoT 스위치" + (position + 1));
+                if (data.getCategoryName().equals("기본")) {
+                    normal.mTypeText.setText("카션 " + data.getCategoryName() + "음");
+                } else {
+                    normal.mTypeText.setText("카션 " + data.getCategoryName());
+                }
+                normal.mPosText.setText("음원" + (position + 1));
+                normal.mNameText.setText(data.getHornName().replaceAll("_", "\n"));
+                break;
+            case EVENT_TYPE:
+                EventIotSwitchViewHolder event = (EventIotSwitchViewHolder) holder;
+                event.mIotText.setText("IoT 스위치" + (position + 1));
+                if (data.getCategoryName().equals("기본")) {
+                    event.mTypeText.setText("카션 " + data.getCategoryName() + "음");
+                } else {
+                    event.mTypeText.setText("카션 " + data.getCategoryName());
+                }
+                event.mPosText.setText("음원" + (position + 1));
+                event.mNameText.setText(data.getHornName().replaceAll("_", "\n"));
+                break;
         }
-        holder.mPosText.setText("음원" + (position + 1));
-        holder.mNameText.setText(data.getHornName().replaceAll("_", "\n"));
     }
 
     @Override
@@ -60,6 +91,16 @@ public class IotSwitchAdapter extends RecyclerView.Adapter<IotSwitchAdapter.IotS
             return 0;
         }
         return 2;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return VIEW_TYPE;
+    }
+
+    public void setItemViewType(int type) {
+        VIEW_TYPE = type;
+        notifyDataSetChanged();
     }
 
     public class IotSwitchViewHolder extends RecyclerView.ViewHolder {
@@ -86,6 +127,58 @@ public class IotSwitchAdapter extends RecyclerView.Adapter<IotSwitchAdapter.IotS
                             mListener.onItemClickListener(v, pos);
                             mNameText.setTextColor(mNameText.getContext().getResources().getColor(R.color.color_531F57));
                             mNameText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_sound_play_icon, 0);
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mNameText.setTextColor(mNameText.getContext().getResources().getColor(R.color.color_A1AAB1));
+                                    mNameText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_home_play_button_disable, 0);
+                                }
+                            }, 500);
+                        }
+                    }
+                }
+            });
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    int pos = getAdapterPosition();
+                    if (pos != RecyclerView.NO_POSITION) {
+                        if (mListener != null) {
+                            mListener.onItemLongClickListener(v, pos);
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+        }
+    }
+
+    public class EventIotSwitchViewHolder extends RecyclerView.ViewHolder {
+
+        private TextView mIotText;
+        private TextView mTypeText;
+        private TextView mPosText;
+        private TextView mNameText;
+
+        public EventIotSwitchViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            mIotText = itemView.findViewById(R.id.item_event_switch_iot_text);
+            mPosText = itemView.findViewById(R.id.item_iot_event_pos_text);
+            mTypeText = itemView.findViewById(R.id.item_iot_event_type);
+            mNameText = itemView.findViewById(R.id.item_iot_event_play_name);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    if (pos != RecyclerView.NO_POSITION) {
+                        if (mListener != null) {
+                            mListener.onItemClickListener(v, pos);
+                            mNameText.setTextColor(mNameText.getContext().getResources().getColor(R.color.color_FC5F3A));
+                            mNameText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_event_play_icon, 0);
                             new Handler().postDelayed(new Runnable() {
                                 @Override
                                 public void run() {

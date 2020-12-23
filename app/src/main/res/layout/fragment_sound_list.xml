@@ -116,18 +116,14 @@
                 android:scrollbars="vertical"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-            <TextView
+            <ImageButton
                 android:id="@+id/sound_custom_horn_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:drawableStart="@drawable/ic_common_logo"
-                android:drawablePadding="4dp"
-                android:fontFamily="@font/scd6"
+                android:background="@null"
                 android:gravity="center_vertical"
-                android:text="나만의 경적은 쇼핑몰에서 구입할 수 있습니다. (클릭)"
-                android:textColor="@color/color_7F44A6"
-                android:textSize="11.39sp"
+                android:src="@drawable/ic_custom_horn_message"
                 android:visibility="gone" />
 
             <TextView

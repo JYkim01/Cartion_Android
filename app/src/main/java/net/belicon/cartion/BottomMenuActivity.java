@@ -145,8 +145,9 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
     public static BleDevice mBleDevice;
     private String token, email, mac, serial;
+    public static String cartionName;
     private byte[] convertByte;
-    private boolean isUserCheck = false;
+    public boolean isUserCheck = false;
     private long pressedTime;
     private boolean isEventMode = false;
 
@@ -154,7 +155,6 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         onCheckPermission();
         setContentView(R.layout.activity_bottom_menu);
 
@@ -206,12 +206,13 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
         if (mAuth.getCurrentUser() != null) {
             email = mAuth.getCurrentUser().getEmail();
+            Log.e("EMAIL", email);
         }
 
         BleManager.getInstance().init(getApplication());
         BleManager.getInstance()
                 .enableLog(true)
-                .setReConnectCount(3, 3000)
+                .setReConnectCount(5, 5000)
                 .setSplitWriteNum(17)
                 .setConnectOverTime(100000)
                 .setOperateTimeout(5000);
@@ -241,7 +242,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                             if (response.body() != null) {
                                 for (int i = 0; i < response.body().getData().getBannerList().size(); i++) {
                                     String url = response.body().getData().getBannerList().get(i).getImageUrl();
-                                    Log.e("BANNER", url);
+//                                    Log.e("BANNER", url);
                                     data.add(url);
                                 }
                                 BannerPagerAdapter scrollAdapter = new BannerPagerAdapter(BottomMenuActivity.this, data);
@@ -410,11 +411,13 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                                     if (macList.size() != 0) {
                                         isUserCheck = true;
                                         mac = devices.get(0).getDeviceMac();
-                                        mNicNameText.setText(devices.get(0).getDeviceName());
+                                        cartionName = devices.get(0).getDeviceName();
+                                        mNicNameText.setText(cartionName);
                                         Log.e("USER MAC", mac);
                                     } else {
                                         isUserCheck = false;
-                                        mNicNameText.setText("Cartion");
+                                        cartionName = "Cartion";
+                                        mNicNameText.setText(cartionName);
                                     }
                                     startScan();
                                 }
@@ -484,7 +487,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                         connect(bleDevice);
                         Log.e("CartionMac", bleDevice.getMac());
                         mBleDevice = bleDevice;
-                        mHomeDialog.setVisibility(View.GONE);
+//                        mHomeDialog.setVisibility(View.GONE);
                         mac = bleDevice.getMac();
                     }
                 } else {
@@ -493,7 +496,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                         BleManager.getInstance().cancelScan();
                         connect(bleDevice);
                         mBleDevice = bleDevice;
-                        mHomeDialog.setVisibility(View.GONE);
+//                        mHomeDialog.setVisibility(View.GONE);
                         mac = bleDevice.getMac();
                     }
                 }
@@ -501,12 +504,12 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 
             @Override
             public void onScanFinished(List<BleDevice> scanResultList) {
-                mHomeDialog.setVisibility(View.GONE);
 //                if (mBleDevice != null) {
 //                } else {
 //                    Toast.makeText(BottomMenuActivity.this, "검색되는 카션이 없습니다.", Toast.LENGTH_LONG).show();
 //                }
                 if (mBleDevice == null) {
+                    mHomeDialog.setVisibility(View.GONE);
                     Toast.makeText(BottomMenuActivity.this, "검색되는 카션이 없습니다.", Toast.LENGTH_LONG).show();
                 } else {
                     Log.e("MAC", mac);
@@ -557,150 +560,126 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 new BleNotifyCallback() {
                     @Override
                     public void onNotifySuccess() {
-
+                        Log.e("NOTIFY SUCCESS", "SUCCESS");
                     }
 
                     @Override
                     public void onNotifyFailure(final BleException exception) {
-
+                        Log.e("NOTIFY FAILURE", exception.toString());
                     }
 
                     @Override
                     public void onCharacteristicChanged(final byte[] data) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mHomeDialog.setVisibility(View.GONE);
-//                                Log.e("NOTIFY", HexUtil.formatHexString(data, true));
-                                String s = new String(data);
-//                                Log.e("NOTIFY DATA 1", s);
-                                Log.e("NOTIFIED", s);
-                                if (s.startsWith("ca") || s.startsWith("FF")) {
-                                    onVersionCheck();
-                                    serial = s;
-                                }
+                        String s = new String(data);
+                        Log.e("NOTIFIED", s);
+                        if (s.startsWith("ca") || s.startsWith("FF")) {
+                            mHomeDialog.setVisibility(View.GONE);
+                            onVersionCheck();
+                            serial = s;
+                        }
 
-                                if (s.startsWith("FwVer")) {
-                                    if (BleManager.getInstance().isConnected(mBleDevice)) {
-                                        ExecutorService es = Executors.newSingleThreadExecutor();
-                                        es.submit(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                writeData(mBleDevice,
-                                                        "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
-                                                        "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
-                                                        onEmailPost("id1:" + email.substring(0, email.indexOf("@")))
-                                                );
-                                            }
-                                        });
-                                        es.submit(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                writeData(mBleDevice,
-                                                        "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
-                                                        "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
-                                                        onAddressPost("id2:" + email.substring(email.indexOf("@") + 1))
-                                                );
-                                            }
-                                        });
-                                        es.shutdown();
+                        if (s.startsWith("FwVer")) {
+                            if (BleManager.getInstance().isConnected(mBleDevice)) {
+                                ExecutorService es = Executors.newSingleThreadExecutor();
+                                es.submit(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        writeData(mBleDevice,
+                                                "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+                                                "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+                                                onEmailPost("id1:" + email.substring(0, email.indexOf("@")))
+                                        );
                                     }
-                                }
-
-                                if (s.equals("Success") || s.equals("Free Passage")) {
-                                    mSearchContainer.setVisibility(View.GONE);
-                                    mInfoContainer.setVisibility(View.VISIBLE);
-                                    if (!isUserCheck) {
-                                        mRetInterface.postCartion(token, email, new Cartion(serial, mac.substring(0, 11), "Cartion"))
-                                                .enqueue(new Callback<MyPage>() {
-                                                    @Override
-                                                    public void onResponse(Call<MyPage> call, Response<MyPage> response) {
-                                                        Log.e("CARTION SUCCESS", "" + response.code());
-                                                        if (response.code() == 200 || response.code() == 201) {
-                                                            Toast.makeText(BottomMenuActivity.this, "카션이 등록되었습니다.", Toast.LENGTH_LONG).show();
-                                                        } else {
-                                                            Toast.makeText(BottomMenuActivity.this, "카션 등록이 실패하였습니다.", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-
-                                                    @Override
-                                                    public void onFailure(Call<MyPage> call, Throwable t) {
-
-                                                    }
-                                                });
+                                });
+                                es.submit(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        writeData(mBleDevice,
+                                                "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+                                                "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+                                                onAddressPost("id2:" + email.substring(email.indexOf("@") + 1))
+                                        );
                                     }
-                                } else if (s.equals("Failure")) {
-                                    Toast.makeText(BottomMenuActivity.this, "다른 사용자 ID의 카션입니다.", Toast.LENGTH_LONG).show();
-                                    mSearchContainer.setVisibility(View.VISIBLE);
-                                    mInfoContainer.setVisibility(View.GONE);
-                                }
-                                if (s.contains("Battery Level")) {
-                                    String battery = s.replace("Battery Level:", "");
-                                    Animation anim = new AlphaAnimation(0.0f, 1.0f);
-                                    anim.setDuration(1000);
-                                    anim.setStartOffset(20);
-                                    anim.setRepeatMode(Animation.REVERSE);
-                                    anim.setRepeatCount(Animation.INFINITE);
-                                    mBatteryText.setText(battery);
-//                                    Log.e("TESTSESTS", Integer.parseInt(battery.replace("%", "")) + "");
-                                    if (Integer.parseInt(battery.replace("%", "").replace(" ", "")) <= 25) {
-                                        mBatteryText.setTextColor(Color.RED);
-                                        mBatteryText.startAnimation(anim);
-                                        Toast.makeText(BottomMenuActivity.this, "충전이 필요합니다.", Toast.LENGTH_LONG).show();
-                                    }
-                                } else if (s.contains("Temperature") && !s.contains("Max Temperature")) {
-                                    mTemperatureText.setText(s.replace("Temperature:", "") + "°C");
-                                }
-                                if (s.contains("EEM:0")) {
-                                    Log.e("Event Mode", "Enabled");
-                                    isEventMode = true;
-                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_event_switch_label).into(mEvent36Btn);
-                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_event_switch_label).into(mEvent710Btn);
-                                    mMobileSwitch36RecyclerView.setBackgroundResource(R.drawable.ic_event_switch_background);
-                                    mMobileSwitch710RecyclerView.setBackgroundResource(R.drawable.ic_event_switch_background);
-                                    if (mMobile36SwitchAdapter != null) {
-                                        mMobile36SwitchAdapter.setItemViewType(Mobile36SwitchAdapter.EVENT_TYPE);
-                                        mMobile710SwitchAdapter.setItemViewType(Mobile710SwitchAdapter.EVENT_TYPE);
-                                    }
-                                } else if (s.contains("EEM:1")) {
-                                    Log.e("Event Mode", "Disabled");
-                                    isEventMode = false;
-                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_moblie_switch_label_1).into(mEvent36Btn);
-                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_moblie_switch_label_2).into(mEvent710Btn);
-                                    mMobileSwitch36RecyclerView.setBackgroundResource(R.drawable.ic_background_3_10);
-                                    mMobileSwitch710RecyclerView.setBackgroundResource(R.drawable.ic_background_3_10);
-                                    if (mMobile36SwitchAdapter != null) {
-                                        mMobile36SwitchAdapter.setItemViewType(Mobile36SwitchAdapter.NORMAL_TYPE);
-                                        mMobile710SwitchAdapter.setItemViewType(Mobile710SwitchAdapter.NORMAL_TYPE);
-                                    }
-                                }
-                                if (s.contains("Event Mode Enabled")) {
-                                    isEventMode = true;
-                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_event_switch_label).into(mEvent36Btn);
-                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_event_switch_label).into(mEvent710Btn);
-                                    mMobileSwitch36RecyclerView.setBackgroundResource(R.drawable.ic_event_switch_background);
-                                    mMobileSwitch710RecyclerView.setBackgroundResource(R.drawable.ic_event_switch_background);
-                                    if (mMobile36SwitchAdapter != null) {
-                                        mMobile36SwitchAdapter.setItemViewType(Mobile36SwitchAdapter.EVENT_TYPE);
-                                        mMobile710SwitchAdapter.setItemViewType(Mobile710SwitchAdapter.EVENT_TYPE);
-                                    }
-                                } else if (s.contains("Event Mode Disabled")) {
-                                    isEventMode = false;
-                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_moblie_switch_label_1).into(mEvent36Btn);
-                                    Glide.with(BottomMenuActivity.this).load(R.drawable.ic_moblie_switch_label_2).into(mEvent710Btn);
-                                    mMobileSwitch36RecyclerView.setBackgroundResource(R.drawable.ic_background_3_10);
-                                    mMobileSwitch710RecyclerView.setBackgroundResource(R.drawable.ic_background_3_10);
-                                    if (mMobile36SwitchAdapter != null) {
-                                        mMobile36SwitchAdapter.setItemViewType(Mobile36SwitchAdapter.NORMAL_TYPE);
-                                        mMobile710SwitchAdapter.setItemViewType(Mobile710SwitchAdapter.NORMAL_TYPE);
-                                    }
-                                }
-                                if (s.contains("CTE")) {
-                                    Log.e("CTE", s);
-                                }
-                                mHomeDialog.setVisibility(View.GONE);
+                                });
+                                es.shutdown();
                             }
-                        });
+                        }
+
+                        if (s.equals("Success") || s.equals("Free Passage")) {
+                            mSearchContainer.setVisibility(View.GONE);
+                            mInfoContainer.setVisibility(View.VISIBLE);
+                            if (!isUserCheck) {
+                                mRetInterface.postCartion(token, email, new Cartion(serial, mac.substring(0, 11), "Cartion"))
+                                        .enqueue(new Callback<MyPage>() {
+                                            @Override
+                                            public void onResponse(Call<MyPage> call, Response<MyPage> response) {
+                                                Log.e("CARTION SUCCESS", "" + response.code());
+                                                if (response.code() == 200 || response.code() == 201) {
+                                                    Toast.makeText(BottomMenuActivity.this, "카션이 등록되었습니다.", Toast.LENGTH_LONG).show();
+                                                } else {
+                                                    Toast.makeText(BottomMenuActivity.this, "카션 등록이 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFailure(Call<MyPage> call, Throwable t) {
+
+                                            }
+                                        });
+                            }
+                        } else if (s.equals("Failure")) {
+                            Toast.makeText(BottomMenuActivity.this, "다른 사용자 ID의 카션입니다.", Toast.LENGTH_LONG).show();
+                            mSearchContainer.setVisibility(View.VISIBLE);
+                            mInfoContainer.setVisibility(View.GONE);
+                        }
+                        if (s.contains("Battery Level")) {
+                            String battery = s.replace("Battery Level:", "");
+                            Animation anim = new AlphaAnimation(0.0f, 1.0f);
+                            anim.setDuration(1000);
+                            anim.setStartOffset(20);
+                            anim.setRepeatMode(Animation.REVERSE);
+                            anim.setRepeatCount(Animation.INFINITE);
+                            mBatteryText.setText(battery);
+//                                    Log.e("TESTSESTS", Integer.parseInt(battery.replace("%", "")) + "");
+                            if (Integer.parseInt(battery.replace("%", "").replace(" ", "")) <= 25) {
+                                mBatteryText.setTextColor(Color.RED);
+                                mBatteryText.startAnimation(anim);
+                                Toast.makeText(BottomMenuActivity.this, "충전이 필요합니다.", Toast.LENGTH_LONG).show();
+                            }
+                        } else if (s.contains("Temperature") && !s.contains("Max Temperature")) {
+                            mTemperatureText.setText(s.replace("Temperature:", "") + "°C");
+                        }
+                        if (s.contains("EEM:0") || s.contains("Event Mode Enabled")) {
+                            Log.e("Event Mode", "Enabled");
+                            isEventMode = true;
+                            Glide.with(BottomMenuActivity.this).load(R.drawable.ic_event_switch_label).into(mEvent36Btn);
+                            Glide.with(BottomMenuActivity.this).load(R.drawable.ic_event_switch_label).into(mEvent710Btn);
+                            mIotSwitchRecyclerView.setBackgroundResource(R.drawable.ic_event_switch_background);
+                            mMobileSwitch36RecyclerView.setBackgroundResource(R.drawable.ic_event_switch_background);
+                            mMobileSwitch710RecyclerView.setBackgroundResource(R.drawable.ic_event_switch_background);
+                            if (mMobile36SwitchAdapter != null) {
+                                mIotSwitchAdapter.setItemViewType(IotSwitchAdapter.EVENT_TYPE);
+                                mMobile36SwitchAdapter.setItemViewType(Mobile36SwitchAdapter.EVENT_TYPE);
+                                mMobile710SwitchAdapter.setItemViewType(Mobile710SwitchAdapter.EVENT_TYPE);
+                            }
+                        } else if (s.contains("EEM:1") || s.contains("Event Mode Disabled")) {
+                            Log.e("Event Mode", "Disabled");
+                            isEventMode = false;
+                            Glide.with(BottomMenuActivity.this).load(R.drawable.ic_moblie_switch_label_1).into(mEvent36Btn);
+                            Glide.with(BottomMenuActivity.this).load(R.drawable.ic_moblie_switch_label_2).into(mEvent710Btn);
+                            mIotSwitchRecyclerView.setBackgroundResource(R.drawable.ic_background_1_2);
+                            mMobileSwitch36RecyclerView.setBackgroundResource(R.drawable.ic_background_3_10);
+                            mMobileSwitch710RecyclerView.setBackgroundResource(R.drawable.ic_background_3_10);
+                            if (mMobile36SwitchAdapter != null) {
+                                mIotSwitchAdapter.setItemViewType(IotSwitchAdapter.NORMAL_TYPE);
+                                mMobile36SwitchAdapter.setItemViewType(Mobile36SwitchAdapter.NORMAL_TYPE);
+                                mMobile710SwitchAdapter.setItemViewType(Mobile710SwitchAdapter.NORMAL_TYPE);
+                            }
+                        }
+                        if (s.contains("CTE")) {
+                            Log.e("CTE", s);
+                        }
+                        mHomeDialog.setVisibility(View.GONE);
                     }
                 });
     }
@@ -720,37 +699,38 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
 //                                Log.e("CURRENT", (int) ((double) current / (double) total * 100.0) + "");
                                 mProgressDialog.setProgress((int) ((double) current / (double) total * 100.0));
                                 if ((int) ((double) current / (double) total * 100.0) == 100) {
+                                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                                     mProgressDialog.dismiss();
-                                    mRetInterface.getMobileSwitch(token, email)
-                                            .enqueue(new Callback<MobileSwitch>() {
-                                                @Override
-                                                public void onResponse(Call<MobileSwitch> call, Response<MobileSwitch> response) {
-                                                    if (response.code() == 200) {
-                                                        if (response.body() != null) {
-                                                            List<SwitchList> list = response.body().getData().getHornList();
-                                                            for (int i = 0; i < list.size(); i++) {
-                                                                String userId = list.get(i).getUserId();
-                                                                String hornType = list.get(i).getHornType();
-                                                                String hornId = list.get(i).getHornId();
-                                                                String hornName = list.get(i).getHornName();
-                                                                String categoryName = list.get(i).getCategoryName();
-                                                                int mobileSwitch = list.get(i).getMobileSwitch();
-                                                                int seq = list.get(i).getSeq();
-                                                                String type = list.get(i).getType();
-                                                                mSwitchMusic.set(i, new UserMobile(email, mobileSwitch, i + 1, hornName, categoryName, hornType, hornId));
-                                                            }
-                                                            mIotSwitchAdapter.notifyDataSetChanged();
-                                                            mMobile36SwitchAdapter.notifyDataSetChanged();
-                                                            mMobile710SwitchAdapter.notifyDataSetChanged();
-                                                        }
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onFailure(Call<MobileSwitch> call, Throwable t) {
-
-                                                }
-                                            });
+//                                    mRetInterface.getMobileSwitch(token, email)
+//                                            .enqueue(new Callback<MobileSwitch>() {
+//                                                @Override
+//                                                public void onResponse(Call<MobileSwitch> call, Response<MobileSwitch> response) {
+//                                                    if (response.code() == 200) {
+//                                                        if (response.body() != null) {
+//                                                            List<SwitchList> list = response.body().getData().getHornList();
+//                                                            for (int i = 0; i < list.size(); i++) {
+//                                                                String userId = list.get(i).getUserId();
+//                                                                String hornType = list.get(i).getHornType();
+//                                                                String hornId = list.get(i).getHornId();
+//                                                                String hornName = list.get(i).getHornName();
+//                                                                String categoryName = list.get(i).getCategoryName();
+//                                                                int mobileSwitch = list.get(i).getMobileSwitch();
+//                                                                int seq = list.get(i).getSeq();
+//                                                                String type = list.get(i).getType();
+//                                                                mSwitchMusic.set(i, new UserMobile(email, mobileSwitch, i + 1, hornName, categoryName, hornType, hornId));
+//                                                            }
+//                                                            mIotSwitchAdapter.notifyDataSetChanged();
+//                                                            mMobile36SwitchAdapter.notifyDataSetChanged();
+//                                                            mMobile710SwitchAdapter.notifyDataSetChanged();
+//                                                        }
+//                                                    }
+//                                                }
+//
+//                                                @Override
+//                                                public void onFailure(Call<MobileSwitch> call, Throwable t) {
+//
+//                                                }
+//                                            });
                                 }
                             }
                         }
@@ -958,20 +938,25 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         for (File tempFile : files) {
             String hornId = "";
             String categoryName = "기본";
+            String hornType = "horn";
             if (realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst() != null) {
                 if (realm.where(UserMobile.class).findAll().size() != 0) {
                     hornId = realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst().getHornId();
                     categoryName = realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst().getCategoryName();
+                    hornType = realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst().getHornType();
                     categoryName = (categoryName == null) ? "기본" : categoryName;
+                    hornType = (hornType == null) ? "horn" : hornType;
                 } else {
                     hornId = "";
                     categoryName = "기본";
+                    hornType = "horn";
                 }
             } else {
                 hornId = "";
                 categoryName = "기본";
+                hornType = "horn";
             }
-            musicList.add(new Down(tempFile.getName(), tempFile, hornId, categoryName));
+            musicList.add(new Down(tempFile.getName(), tempFile, hornId, categoryName, hornType));
         }
         DownloadAdapter adapter = new DownloadAdapter(BottomMenuActivity.this, musicList, token, mRetInterface);
         recyclerView.setAdapter(adapter);
@@ -989,6 +974,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         adapter.setOnItemClickListener(new DownloadAdapter.OnDownClickListener() {
             @Override
             public void onItemClick(View v, int position) {
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 mProgressDialog = new ProgressDialog(BottomMenuActivity.this);
                 mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 mProgressDialog.setMessage("다운로드 중 취소되면 오류가\n생길 수 있습니다.");
@@ -997,6 +983,11 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                 mProgressDialog.setMax(100);
                 mProgressDialog.show();
                 try {
+                    Log.e("InDEXXXXXXXXX", index);
+                    mSwitchMusic.set(Integer.parseInt(index) - 1, new UserMobile(email, Integer.parseInt(mobileSwitch), Integer.parseInt(index), musicList.get(position).getName(), musicList.get(position).getCategoryName(), musicList.get(position).getHornType(), musicList.get(position).getHornId()));
+                    mIotSwitchAdapter.notifyDataSetChanged();
+                    mMobile36SwitchAdapter.notifyDataSetChanged();
+                    mMobile710SwitchAdapter.notifyDataSetChanged();
                     convertStreamToByteArray(musicList.get(position).getFile());
                     onDownload(mBleDevice, musicList.get(position).getName(), mobileSwitch, index);
                     dialog.dismiss();
@@ -1186,6 +1177,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
         switch (v.getId()) {
             case R.id.bottom_home_btn:
                 onEventListen();
+                mNicNameText.setText(cartionName);
 //                getSupportFragmentManager().beginTransaction().add(R.id.bottom_menu_container, new HomeFragment()).addToBackStack(null).commit();
                 if (fragmentContainer != null) {
                     mHomeDialog.setVisibility(View.GONE);
@@ -1238,6 +1230,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                         isEventMode = false;
                         commend = "EEM:1";
                     } else {
+                        Toast.makeText(BottomMenuActivity.this, "이벤트 버튼을 한번 더 누르시면 수동해제 되고, 6시간이 경과하거나 운행 시 자동 해제됩니다. 앱과 연결되어 있을때는 IoT 스위치의 연결은 제한됩니다.", Toast.LENGTH_LONG).show();
                         isEventMode = true;
                         commend = "EEM:0";
                     }
@@ -1316,7 +1309,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                     writeData(mBleDevice,
                             "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
-                            onCommend0("" + ((mSwitchMusic.get(position).getMobileSwitch() - 1) + 2))
+                            onCommend0("" + (mSwitchMusic.get(position + 2).getMobileSwitch() - 1))
                     );
                 }
                 onEventListen();
@@ -1344,7 +1337,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
                     writeData(mBleDevice,
                             "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
                             "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
-                            onCommend0("" + ((mSwitchMusic.get(position).getMobileSwitch() - 1) + 5))
+                            onCommend0("" + (mSwitchMusic.get(position + 5).getMobileSwitch() - 1))
                     );
                 }
                 onEventListen();
@@ -1420,6 +1413,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void onVersionCheck() {
+        Log.e("VERSION TEST", "" + (int) (1.0 * 100));
         if (BleManager.getInstance().isConnected(mBleDevice)) {
             Log.e("COMMEND", "버전 확인");
             writeData(mBleDevice,

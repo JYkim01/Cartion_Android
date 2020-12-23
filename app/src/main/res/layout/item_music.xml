@@ -61,16 +61,16 @@
 
         <ImageButton
             android:id="@+id/item_sound_preview_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_marginEnd="18dp"
             android:background="@null"
-            android:src="@drawable/listening_selector" />
+            android:src="@drawable/ic_preview_listening_icon_off" />
 
         <ImageButton
             android:id="@+id/item_sound_download_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_marginEnd="14dp"
             android:background="@null"
             android:src="@drawable/download_selector" />

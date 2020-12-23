@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -46,7 +47,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
     private TabLayout mSoundListTabLayout;
     private RecyclerView mSoundListRecyclerView;
     private Spinner mCategorySpinner;
-    private TextView mSoundCustomHornLink;
+    private ImageButton mSoundCustomHornLink;
 //    private TextView mMoreBtn;
 //    private MaterialSpinner mSoundListMaterialSpinner;
 
@@ -58,6 +59,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
     private String token, email, categoryPos, categoryName, type;
     private int offset = 0;
     private int limit = 20;
+    private int total;
 
     public SoundListFragment() {
     }
@@ -159,6 +161,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                         Log.e("HORN CODE", "" + response.code());
                         if (response.code() == 200) {
                             if (response.body() != null) {
+                                total = response.body().getTotal();
                                 List<HornList> item = response.body().getData().getHornList();
                                 for (int i = 0; i < item.size(); i++) {
                                     mMusicList.add(new HornList(item.get(i).getHornId(), item.get(i).getHornName(), item.get(i).getCategoryName(), item.get(i).getWavPath(), item.get(i).getAdpcmPath()));
@@ -199,13 +202,14 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
 
                 int lastVisibleItemPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
                 int itemTotalCount = recyclerView.getAdapter().getItemCount() - 1;
-                if (lastVisibleItemPosition == itemTotalCount) {
-                    Log.d("RECYCLER VIEW", "last Position...");
-                    limit = limit + 10;
-                    if (mSoundListTabLayout.getSelectedTabPosition() == 0) {
-                        onSoundResponse();
-                    } else {
-                        onMySoundResponse();
+                if (lastVisibleItemPosition <= total || total == 0) {
+                    if (lastVisibleItemPosition == itemTotalCount) {
+                        limit = limit + 10;
+                        if (mSoundListTabLayout.getSelectedTabPosition() == 0) {
+                            onSoundResponse();
+                        } else {
+                            onMySoundResponse();
+                        }
                     }
                 }
             }
@@ -230,6 +234,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                         Log.e("HORN CODE", "" + response.code());
                         if (response.code() == 200) {
                             if (response.body() != null) {
+                                total = response.body().getTotal();
                                 List<HornList> item = response.body().getData().getHornList();
                                 for (int i = 0; i < item.size(); i++) {
                                     mMusicList.add(new HornList(item.get(i).getHornId(), item.get(i).getHornName(), item.get(i).getCategoryName(), item.get(i).getWavPath(), item.get(i).getAdpcmPath()));
@@ -282,7 +287,7 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
 //                mMoreBtn.setVisibility(View.VISIBLE);
                 break;
             case R.id.sound_custom_horn_message:
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.cartion.co.kr/front/goods/goodsDetail.do?goodsNo=G2012161053_0016")));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.cartion.co.kr/front/community/bbsList.do?bbsId=request")));
                 break;
 //            case R.id.sound_list_more_btn:
 //                limit = 9999;

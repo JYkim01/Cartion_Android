@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -56,7 +57,7 @@ import retrofit2.Response;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
-public class MyPageFragment extends Fragment implements View.OnClickListener {
+public class MyPageFragment extends Fragment implements View.OnClickListener, View.OnTouchListener {
 
     private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private RetrofitInterface mRetInterface;
@@ -99,6 +100,11 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
         mPhoneLine = view.findViewById(R.id.my_page_phone_line);
         mDeviceRecyclerView = view.findViewById(R.id.my_page_device_recycler_view);
         mConfirmBtn = view.findViewById(R.id.my_page_settings_confirm_btn);
+
+
+        view.setOnTouchListener(this);
+        view.findViewById(R.id.my_page_view_container).setOnTouchListener(this);
+        view.findViewById(R.id.my_page_info_container).setOnTouchListener(this);
 
         token = "Bearer " + User.getUserToken();
         if (mAuth.getCurrentUser() != null) {
@@ -254,6 +260,9 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
         mDeviceRecyclerView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
         mConfirmBtn.setVisibility(View.GONE);
+        if (mDeviceList.size() != 0) {
+            BottomMenuActivity.cartionName = mDeviceList.get(0).getDeviceName();
+        }
         Toast.makeText(getActivity(), "정보가 변경되었습니다.", Toast.LENGTH_SHORT).show();
     }
 
@@ -284,6 +293,37 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
 //                });
 //    }
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        int action = event.getAction();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                if (BleManager.getInstance().isConnected(BottomMenuActivity.mBleDevice)) {
+                    new BottomMenuActivity().writeData(BottomMenuActivity.mBleDevice,
+                            "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+                            "6e400002-b5a3-f393-e0a9-e50e24dcca9e",
+                            onListen("CTE:0")
+                    );
+                }
+                break;
+        }
+        return true;
+    }
+
+    private byte[] onListen(String event) {
+        int checksum = 0;
+
+        byte[] bytes = event.getBytes();
+        byte[] dataBytes = new byte[event.length() + 1];
+        for (int i = 0; i < bytes.length; i++) {
+            dataBytes[i] = bytes[i];
+            checksum += bytes[i];
+        }
+        dataBytes[event.length()] = (byte) (checksum % 256);
+        checksum = 0;
+        return dataBytes;
+    }
+
     private class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DeviceViewHolder> {
 
         private List<Cartion> mDeviceList;
@@ -301,7 +341,7 @@ public class MyPageFragment extends Fragment implements View.OnClickListener {
         @Override
         public void onBindViewHolder(@NonNull DeviceViewHolder holder, int position) {
             Cartion item = mDeviceList.get(position);
-            holder.mDeviceText.setText(item.getDeviceId() + " : " + item.getDeviceName());
+            holder.mDeviceText.setText(item.getDeviceId() + "  :  " + item.getDeviceName());
         }
 
         @Override

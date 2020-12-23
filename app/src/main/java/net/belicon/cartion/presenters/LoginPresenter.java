@@ -113,7 +113,10 @@ public class LoginPresenter implements MainConstants.OnLogin {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 dialog.setVisibility(View.GONE);
-                                Toast.makeText(context, "이메일을 확인해주세요.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "이메일 인증 메일을 발송하였습니다. 확인 부탁드립니다.", Toast.LENGTH_LONG).show();
+                            } else {
+                                dialog.setVisibility(View.GONE);
+                                Toast.makeText(context, "인증 실패. 이메일 인증 메일을 확인해주세요.", Toast.LENGTH_LONG).show();
                             }
                         }
                     });

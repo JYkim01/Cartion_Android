@@ -59,6 +59,16 @@
                     android:textColor="@color/color_606060"
                     android:textSize="13.29sp" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:fontFamily="@font/scd2"
+                    android:text="* 카션과 연결하지 않아도 둘러보기는 가능합니다."
+                    android:textColor="@color/color_FC5F3A"
+                    android:textSize="11.39sp" />
+
                 <ImageButton
                     android:id="@+id/home_cartion_search_btn"
                     android:layout_width="wrap_content"

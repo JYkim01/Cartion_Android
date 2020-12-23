@@ -12,8 +12,10 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -37,6 +39,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private MainConstants.OnLogin onLogin;
 
+    private ImageView mBgImage;
     private EditText mEmailEdit, mPasswordEdit;
     private FrameLayout mDialog;
 
@@ -48,6 +51,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         doFullScreen();
         setContentView(R.layout.activity_login);
 
+        mBgImage = findViewById(R.id.login_bg_image);
         mEmailEdit = findViewById(R.id.login_email_edit);
         mPasswordEdit = findViewById(R.id.login_password_edit);
         mDialog = findViewById(R.id.login_dialog);
@@ -56,6 +60,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         findViewById(R.id.login_btn).setOnClickListener(this);
         findViewById(R.id.login_forgot_password_btn).setOnClickListener(this);
         findViewById(R.id.login_sign_up_btn).setOnClickListener(this);
+
+        Glide.with(this).load(R.drawable.login_bg).into(mBgImage);
 
         RetrofitInterface mRetInterface = RetrofitUtility.getRetrofitInterface();
 

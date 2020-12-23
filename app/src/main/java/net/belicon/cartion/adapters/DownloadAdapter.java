@@ -1,6 +1,8 @@
 package net.belicon.cartion.adapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.media.Image;
 import android.media.MediaPlayer;
@@ -15,6 +17,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import net.belicon.cartion.BottomMenuActivity;
 import net.belicon.cartion.R;
@@ -94,22 +98,29 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
                         Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기가 불가능한 음원 입니다.", Toast.LENGTH_SHORT).show();
                     } else {
                         mActivity.onEventListen();
+                        Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon).into(holder.mMusicPreviewBtn);
                         retrofit.getPCM(mAuth, item.getHornId())
                                 .enqueue(new Callback<ResponseBody>() {
                                     @Override
                                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                                         if (response.code() == 200) {
                                             try {
-                                                playWav(holder.mMusicPreviewBtn.getContext(), response.body().bytes(), item.getName());
+                                                playWav(holder.mMusicPreviewBtn.getContext(), holder.mMusicPreviewBtn, response.body().bytes(), item.getName());
                                             } catch (IOException e) {
                                                 e.printStackTrace();
                                             }
+                                        } else {
+                                            isPlaying = false;
+                                            Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
+                                            Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기 재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                                         }
                                     }
 
                                     @Override
                                     public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                                        isPlaying = false;
+                                        Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
+                                        Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기 재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     }
@@ -118,6 +129,37 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
                 }
             }
         });
+//        holder.mMusicDeleteBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                AlertDialog.Builder builder = new AlertDialog.Builder(holder.mMusicDeleteBtn.getContext());
+//                builder.setTitle("음원 삭제").setMessage(item.getName() + "을(를) 삭제 하시겠습니까?")
+//                        .setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                try {
+//                                    File file = new File(String.valueOf(holder.mMusicDeleteBtn.getContext().getExternalFilesDir(null)) + "/" + item.getName());
+//                                    if (file.exists()) {
+//                                        file.delete();
+//                                        mMusicList.remove(position);
+//                                        notifyDataSetChanged();
+//                                    }
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                        })
+//                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                dialog.dismiss();
+//                            }
+//                        });
+//
+//                AlertDialog dialog = builder.create();
+//                dialog.show();
+//            }
+//        });
     }
 
     @Override
@@ -125,7 +167,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
         return mMusicList.size();
     }
 
-    private void playWav(Context context, byte[] mp3SoundByteArray, String name) {
+    private void playWav(Context context, ImageButton previewBtn, byte[] mp3SoundByteArray, String name) {
         try {
 
             File path = new File(context.getCacheDir(), name + ".wav");
@@ -154,6 +196,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     isPlaying = false;
+                    Glide.with(previewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(previewBtn);
                 }
             });
         } catch (IOException ex) {
@@ -169,6 +212,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
         private TextView mMusicTitleText;
         private ImageButton mMusicPreviewBtn;
         private ImageButton mMusicDownloadBtn;
+//        private ImageButton mMusicDeleteBtn;
 
         public DownloadViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -178,6 +222,7 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
             mMusicTitleText = itemView.findViewById(R.id.item_download_title_text);
             mMusicPreviewBtn = itemView.findViewById(R.id.item_download_preview_btn);
             mMusicDownloadBtn = itemView.findViewById(R.id.item_download_download_btn);
+//            mMusicDeleteBtn = itemView.findViewById(R.id.item_download_delete_btn);
 
             mMusicDownloadBtn.setOnClickListener(new View.OnClickListener() {
                 @Override

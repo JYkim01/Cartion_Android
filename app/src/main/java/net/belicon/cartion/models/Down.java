@@ -8,12 +8,14 @@ public class Down {
     private File file;
     private String hornId;
     private String categoryName;
+    private String hornType;
 
-    public Down(String name, File file, String hornId, String categoryName) {
+    public Down(String name, File file, String hornId, String categoryName, String hornType) {
         this.name = name;
         this.file = file;
         this.hornId = hornId;
         this.categoryName = categoryName;
+        this.hornType = hornType;
     }
 
     public String getName() {
@@ -48,6 +50,14 @@ public class Down {
         this.categoryName = categoryName;
     }
 
+    public String getHornType() {
+        return hornType;
+    }
+
+    public void setHornType(String hornType) {
+        this.hornType = hornType;
+    }
+
     @Override
     public String toString() {
         return "Down{" +
@@ -55,6 +65,7 @@ public class Down {
                 ", file=" + file +
                 ", hornId='" + hornId + '\'' +
                 ", categoryName='" + categoryName + '\'' +
+                ", hornType='" + hornType + '\'' +
                 '}';
     }
 }

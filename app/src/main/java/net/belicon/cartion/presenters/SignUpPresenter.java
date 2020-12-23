@@ -75,7 +75,7 @@ public class SignUpPresenter implements MainConstants.OnSingUp {
                 Toast.makeText(context, "아이디 중복체크를 해주세요.", Toast.LENGTH_SHORT).show();
             }
         } else if (message2.getVisibility() == View.VISIBLE){
-            Toast.makeText(context, "비밀번호와 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -96,8 +96,7 @@ public class SignUpPresenter implements MainConstants.OnSingUp {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                 if (task.isSuccessful()) {
-                                                                    Toast.makeText(context, "이메일을 확인해주세요.", Toast.LENGTH_LONG).show();
-//                            Toast.makeText(context, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                                                                    Toast.makeText(context, "이메일 인증 메일을 발송하였습니다. 확인 부탁드립니다.", Toast.LENGTH_LONG).show();
                                                                     activity.finish();
                                                                 }
                                                             }

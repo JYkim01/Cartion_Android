@@ -41,7 +41,7 @@
             android:layout_marginTop="20dp"
             android:fontFamily="@font/scd5"
             android:gravity="center_horizontal"
-            android:text="모바일 스위치는 운전중 사용을 금지하고\n이벤트 활용시 사용하세요."
+            android:text="모바일 스위치는 운전 중 사용을 금지합니다."
             android:textColor="@android:color/white"
             android:textSize="12.34sp" />
 
@@ -52,7 +52,7 @@
             android:layout_marginTop="20dp"
             android:fontFamily="@font/scd5"
             android:gravity="center_horizontal"
-            android:text="* 보조석 탑승자가 사용하여도 됩니다."
+            android:text="* 보조석 탑승자는 사용하여도 됩니다."
             android:textColor="@android:color/white"
             android:textSize="10.44sp" />
 
