@@ -940,6 +940,7 @@ public class BottomMenuActivity extends AppCompatActivity implements View.OnClic
             String categoryName = "기본";
             String hornType = "horn";
             if (realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst() != null) {
+                Log.e("TYPEtetet",  realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst().getHornType());
                 if (realm.where(UserMobile.class).findAll().size() != 0) {
                     hornId = realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst().getHornId();
                     categoryName = realm.where(UserMobile.class).equalTo("hornName", tempFile.getName()).findFirst().getCategoryName();

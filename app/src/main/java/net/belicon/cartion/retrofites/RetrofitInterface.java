@@ -68,8 +68,14 @@ public interface RetrofitInterface {
     @GET("/api/horn/wav/{hornId}/")
     Call<ResponseBody> getPCM(@Header("Authorization") String token, @Path("hornId") String hornId);
 
+    @GET("/api/customHorn/wav/{hornId}/")
+    Call<ResponseBody> getCustomPCM(@Header("Authorization") String token, @Path("hornId") String hornId);
+
     @GET("/api/horn/ADPCM/{hornId}/")
     Call<ResponseBody> getADPCM(@Header("Authorization") String token, @Path("hornId") String hornId);
+
+    @GET("/api/customHorn/ADPCM/{hornId}/")
+    Call<ResponseBody> getCustomADPCM(@Header("Authorization") String token, @Path("hornId") String hornId);
 
     @GET("/api/{userId}/horn")
     Call<MobileSwitch> getMobileSwitch(@Header("Authorization") String token, @Path("userId") String userId);

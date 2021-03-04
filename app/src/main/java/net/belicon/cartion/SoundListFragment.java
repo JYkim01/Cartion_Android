@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -202,13 +203,15 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
 
                 int lastVisibleItemPosition = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastCompletelyVisibleItemPosition();
                 int itemTotalCount = recyclerView.getAdapter().getItemCount() - 1;
-                if (lastVisibleItemPosition <= total || total == 0) {
-                    if (lastVisibleItemPosition == itemTotalCount) {
-                        limit = limit + 10;
-                        if (mSoundListTabLayout.getSelectedTabPosition() == 0) {
-                            onSoundResponse();
-                        } else {
-                            onMySoundResponse();
+                if (itemTotalCount > 10) {
+                    if (lastVisibleItemPosition <= total || total == 0) {
+                        if (lastVisibleItemPosition == itemTotalCount) {
+                            limit = limit + 10;
+                            if (mSoundListTabLayout.getSelectedTabPosition() == 0) {
+                                onSoundResponse();
+                            } else {
+                                onMySoundResponse();
+                            }
                         }
                     }
                 }
@@ -255,11 +258,12 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
 
     private void onMySoundResponse() {
         mMusicList.clear();
+        mAdapter.notifyDataSetChanged();
         mRetInterface.getMyMusicList(token)
                 .enqueue(new Callback<Horn>() {
                     @Override
                     public void onResponse(Call<Horn> call, Response<Horn> response) {
-                        Log.e("HORN CODE", "" + response.code());
+                        Log.e("C_HORN CODE", "" + response.code());
                         if (response.code() == 200) {
                             if (response.body() != null) {
                                 List<HornList> item = response.body().getData().getHornList();
@@ -267,13 +271,15 @@ public class SoundListFragment extends Fragment implements View.OnClickListener 
                                     mMusicList.add(new HornList(item.get(i).getHornId(), item.get(i).getHornName(), item.get(i).getCategoryName(), item.get(i).getWavPath(), item.get(i).getAdpcmPath()));
                                 }
                                 mAdapter.notifyDataSetChanged();
+                            } else {
+                                Toast.makeText(getActivity(), "나만의 경적이 없습니다.", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
 
                     @Override
                     public void onFailure(Call<Horn> call, Throwable t) {
-
+                        Log.e("C_HORN FAILURE", t.getLocalizedMessage());
                     }
                 });
     }

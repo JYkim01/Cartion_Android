@@ -63,10 +63,14 @@ public class IotSwitchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             case NORMAL_TYPE:
                 IotSwitchViewHolder normal = (IotSwitchViewHolder) holder;
                 normal.mIotText.setText("IoT 스위치" + (position + 1));
-                if (data.getCategoryName().equals("기본")) {
-                    normal.mTypeText.setText("카션 " + data.getCategoryName() + "음");
+                if (data.getHornType().equals("horn")) {
+                    if (data.getCategoryName().equals("기본")) {
+                        normal.mTypeText.setText("카션 " + data.getCategoryName() + "음");
+                    } else {
+                        normal.mTypeText.setText("카션 " + data.getCategoryName());
+                    }
                 } else {
-                    normal.mTypeText.setText("카션 " + data.getCategoryName());
+                    normal.mTypeText.setText("나만의 음원");
                 }
                 normal.mPosText.setText("음원" + (position + 1));
                 normal.mNameText.setText(data.getHornName().replaceAll("_", "\n"));
@@ -74,10 +78,14 @@ public class IotSwitchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             case EVENT_TYPE:
                 EventIotSwitchViewHolder event = (EventIotSwitchViewHolder) holder;
                 event.mIotText.setText("IoT 스위치" + (position + 1));
-                if (data.getCategoryName().equals("기본")) {
-                    event.mTypeText.setText("카션 " + data.getCategoryName() + "음");
+                if (data.getHornType().equals("horn")) {
+                    if (data.getCategoryName().equals("기본")) {
+                        event.mTypeText.setText("카션 " + data.getCategoryName() + "음");
+                    } else {
+                        event.mTypeText.setText("카션 " + data.getCategoryName());
+                    }
                 } else {
-                    event.mTypeText.setText("카션 " + data.getCategoryName());
+                    event.mTypeText.setText("나만의 음원");
                 }
                 event.mPosText.setText("음원" + (position + 1));
                 event.mNameText.setText(data.getHornName().replaceAll("_", "\n"));

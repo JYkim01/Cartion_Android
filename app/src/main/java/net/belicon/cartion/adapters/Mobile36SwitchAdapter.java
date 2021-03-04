@@ -60,20 +60,28 @@ public class Mobile36SwitchAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         switch (holder.getItemViewType()) {
             case NORMAL_TYPE:
                 Mobile36SwitchViewHolder normal = (Mobile36SwitchViewHolder) holder;
-                if (data.getCategoryName().equals("기본")) {
-                    normal.mTypeText.setText("카션 " + data.getCategoryName() + "음");
+                if (data.getHornType().equals("horn")) {
+                    if (data.getCategoryName().equals("기본")) {
+                        normal.mTypeText.setText("카션 " + data.getCategoryName() + "음");
+                    } else {
+                        normal.mTypeText.setText("카션 " + data.getCategoryName());
+                    }
                 } else {
-                    normal.mTypeText.setText("카션 " + data.getCategoryName());
+                    normal.mTypeText.setText("나만의 음원");
                 }
                 normal.mPosText.setText("음원" + (position + 3));
                 normal.mNameText.setText(data.getHornName().replaceAll("_", "\n"));
                 break;
             case EVENT_TYPE:
                 Event36SwitchViewHolder event = (Event36SwitchViewHolder) holder;
-                if (data.getCategoryName().equals("기본")) {
-                    event.mTypeText.setText("카션 " + data.getCategoryName() + "음");
+                if (data.getHornType().equals("horn")) {
+                    if (data.getCategoryName().equals("기본")) {
+                        event.mTypeText.setText("카션 " + data.getCategoryName() + "음");
+                    } else {
+                        event.mTypeText.setText("카션 " + data.getCategoryName());
+                    }
                 } else {
-                    event.mTypeText.setText("카션 " + data.getCategoryName());
+                    event.mTypeText.setText("나만의 음원");
                 }
                 event.mPosText.setText("음원" + (position + 3));
                 event.mNameText.setText(data.getHornName().replaceAll("_", "\n"));

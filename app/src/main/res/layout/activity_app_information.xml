@@ -44,7 +44,6 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/scd2"
                 android:text="0.1.2"
-                android:autoSizeTextType="uniform"
                 android:textColor="@color/color_7F44A6"
                 android:textSize="16sp" />
 

@@ -84,10 +84,14 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
     public void onBindViewHolder(@NonNull DownloadViewHolder holder, int position) {
         Down item = mMusicList.get(position);
         holder.mMusicPositionText.setText(String.valueOf(position + 1));
-        if (item.getCategoryName().equals("기본")) {
-            holder.mMusicCategoryText.setText("카션 " + item.getCategoryName() + "음");
+        if (mMusicList.get(position).getHornType().equals("horn")) {
+            if (item.getCategoryName().equals("기본")) {
+                holder.mMusicCategoryText.setText("카션 " + item.getCategoryName() + "음");
+            } else {
+                holder.mMusicCategoryText.setText("카션 " + item.getCategoryName());
+            }
         } else {
-            holder.mMusicCategoryText.setText("카션 " + item.getCategoryName());
+            holder.mMusicCategoryText.setText("나만의 음원");
         }
         holder.mMusicTitleText.setText(item.getName());
         holder.mMusicPreviewBtn.setOnClickListener(new View.OnClickListener() {
@@ -99,30 +103,11 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
                     } else {
                         mActivity.onEventListen();
                         Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon).into(holder.mMusicPreviewBtn);
-                        retrofit.getPCM(mAuth, item.getHornId())
-                                .enqueue(new Callback<ResponseBody>() {
-                                    @Override
-                                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                        if (response.code() == 200) {
-                                            try {
-                                                playWav(holder.mMusicPreviewBtn.getContext(), holder.mMusicPreviewBtn, response.body().bytes(), item.getName());
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-                                        } else {
-                                            isPlaying = false;
-                                            Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
-                                            Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기 재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                                        isPlaying = false;
-                                        Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
-                                        Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기 재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                        if (item.getHornType().equals("horn")) {
+                            playHorn(holder, position, item);
+                        } else {
+                            playCustom(holder, position, item);
+                        }
                     }
                 } else {
                     Toast.makeText(mActivity, "다른 음원이 재생 중 입니다.", Toast.LENGTH_SHORT).show();
@@ -160,6 +145,60 @@ public class DownloadAdapter extends RecyclerView.Adapter<DownloadAdapter.Downlo
 //                dialog.show();
 //            }
 //        });
+    }
+
+    private void playHorn(DownloadViewHolder holder, int position, Down item) {
+        retrofit.getPCM(mAuth, item.getHornId())
+                .enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.code() == 200) {
+                            try {
+                                playWav(holder.mMusicPreviewBtn.getContext(), holder.mMusicPreviewBtn, response.body().bytes(), item.getName());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            isPlaying = false;
+                            Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
+                            Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기 재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        isPlaying = false;
+                        Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
+                        Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기 재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void playCustom(DownloadViewHolder holder, int position, Down item) {
+        retrofit.getCustomPCM(mAuth, item.getHornId())
+                .enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.code() == 200) {
+                            try {
+                                playWav(holder.mMusicPreviewBtn.getContext(), holder.mMusicPreviewBtn, response.body().bytes(), item.getName());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            isPlaying = false;
+                            Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
+                            Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기 재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        isPlaying = false;
+                        Glide.with(holder.mMusicPreviewBtn.getContext()).load(R.drawable.ic_preview_listening_icon_off).into(holder.mMusicPreviewBtn);
+                        Toast.makeText(holder.mMusicPreviewBtn.getContext(), "미리듣기 재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @Override
